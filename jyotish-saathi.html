@@ -113,6 +113,20 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 .chip.gold{background:var(--astro-gold-bg);border-color:var(--secondary-30);color:var(--astro-gold-dark);font-weight:600;}
 .chip.gold:hover{background:var(--secondary-30);}
 
+/* CHAT TOPIC LIST */
+.chat-topic-list { display:flex; flex-direction:column; margin:10px 0 2px; width:100%; }
+.chat-topic-row { display:flex; align-items:center; gap:12px; padding:13px 0;
+  border-bottom:1px solid var(--stroke-subtle); cursor:pointer; background:none;
+  border-left:none; border-right:none; border-top:none; width:100%;
+  font-family:'JioType',sans-serif; text-align:left; transition:background var(--dur-quick); }
+.chat-topic-row:last-child { border-bottom:none; padding-bottom:0; }
+.chat-topic-row:active { background:var(--surface-minimal,#f5f5f5); border-radius:8px; }
+.chat-topic-row-icon { font-size:22px; flex-shrink:0; width:30px; text-align:center; }
+.chat-topic-row-body { flex:1; }
+.chat-topic-row-title { font-size:14px; font-weight:700; color:var(--text-high); }
+.chat-topic-row-desc { font-size:12px; color:var(--text-low); margin-top:2px; }
+.chat-topic-row-arrow { font-size:18px; color:var(--text-low); flex-shrink:0; }
+
 /* BOTTOM INPUT */
 .bottom-widget{width:100%;padding:2px 12px 8px;background:var(--surface);flex-shrink:0;}
 .bw-container{background:var(--surface-ghost);border-radius:var(--shape-4xl);padding:var(--spacing-2xs);display:flex;flex-direction:column;}
@@ -4058,35 +4072,69 @@ function _hideLandingAndStartChat(ctx) {
   }, 360);
 }
 
+const CHAT_TOPICS_FULL = [
+  { icon:'❤️', label:'Love & Relationships', desc:'Pyaar, shaadi, compatibility',   key:'love' },
+  { icon:'💼', label:'Career & Work',         desc:'Job, business, promotions',      key:'career_menu' },
+  { icon:'💰', label:'Money & Finance',       desc:'Income, investments, savings',   key:'money_menu' },
+  { icon:'🌿', label:'Health & Wellness',     desc:'Energy, immunity, recovery',     key:'health_menu' },
+  { icon:'🏠', label:'Ghar & Family',         desc:'Property, family harmony',       key:'home' },
+  { icon:'🔮', label:'Life & Future',         desc:'Purpose, destiny, life path',    key:'life_future' },
+];
+
 function _startChatTopicMenu() {
   setTimeout(() => {
-    const msg = aiMessage('Namaste! Aap kiske baare mein jaanna chahte hain? 🔮', false, false);
-    const cr = document.createElement('div'); cr.className = 'chip-row';
-    cr.innerHTML = CHAT_TOPICS_MENU.map((t, i) =>
-      `<button class="chip chip-appear-${i+1}" onclick="_startChatFromTopicKey('${t.key}')">${t.icon} ${t.label}</button>`
+    const msg = aiMessage('Aap kiske baare mein jaanna chahte hain? 🔮', false, false);
+    const list = document.createElement('div');
+    list.className = 'chat-topic-list';
+    list.innerHTML = CHAT_TOPICS_FULL.map(t =>
+      `<button class="chat-topic-row" onclick="_startChatFromTopicKey('${t.key}')">
+         <div class="chat-topic-row-icon">${t.icon}</div>
+         <div class="chat-topic-row-body">
+           <div class="chat-topic-row-title">${t.label}</div>
+           <div class="chat-topic-row-desc">${t.desc}</div>
+         </div>
+         <div class="chat-topic-row-arrow">›</div>
+       </button>`
     ).join('');
-    msg.querySelector('.ai-content').appendChild(cr);
+    msg.querySelector('.ai-content').appendChild(list);
     scrollBottom();
   }, 500);
 }
 
 function _startChatFromTopicKey(key) {
-  const topic = CHAT_TOPICS_MENU.find(t => t.key === key);
+  const topic = CHAT_TOPICS_FULL.find(t => t.key === key);
   const teaser = TOPIC_MENU_CHAT[key] || TOPIC_MENU_CHAT.life_future;
   userMessage(topic ? `${topic.icon} ${topic.label}` : key);
   showThinkingThen(() => {
     const msg = aiMessage(
       `<p>${teaser}</p>
-       <p>Main aapko bahut kuch bata sakta hoon — lekin <strong>aapki personal kundali</strong> ho toh exact timing, specific guidance aur sahi answers mil sakte hain.</p>
-       <p>Kya aap apni <strong>birth date, time aur jagah</strong> share karenge? Main abhi kundali banata hoon 🔮</p>`,
+       <p>Main aapko aur detail mein bata sakta hoon — lekin <strong>aapki personal kundali</strong> ho toh exact timing, specific guidance aur sahi answers milenge 🔮</p>
+       <p>Kya aap birth details denge ya pehle se bani kundali upload karenge?</p>`,
       false, false);
     const cr = document.createElement('div'); cr.className = 'chip-row';
     cr.innerHTML = `
-      <button class="chip cta chip-appear-1" onclick="chipTap('get_started')">✦ Kundali banao</button>
-      <button class="chip chip-appear-2" onclick="_startChatTopicMenu()">Aur topics dekhein</button>`;
+      <button class="chip cta chip-appear-1" onclick="chipTap('get_started')">✦ Birth date do, kundali banao</button>
+      <button class="chip chip-appear-2" onclick="_handleKundliUpload()">📄 Kundali upload karo</button>
+      <button class="chip chip-appear-3" onclick="_startChatTopicMenu()">Aur topics dekhein</button>`;
     msg.querySelector('.ai-content').appendChild(cr);
     scrollBottom();
   }, 1400);
+}
+
+function _handleKundliUpload() {
+  userMessage('📄 Kundali upload karna chahta/chahti hoon');
+  showThinkingThen(() => {
+    const msg = aiMessage(
+      `<p>Bilkul! Aap apni kundali PDF ya photo ke roop mein share kar sakte hain 📄</p>
+       <p>Main isko read karke aapki <strong>graha sthiti, dasha period aur planetary positions</strong> samajh lunga aur personalized guidance dunga.</p>`,
+      false, false);
+    const cr = document.createElement('div'); cr.className = 'chip-row';
+    cr.innerHTML = `
+      <button class="chip cta chip-appear-1" onclick="userMessage('Kundali file attach kar raha/rahi hoon')">📎 File attach karo</button>
+      <button class="chip chip-appear-2" onclick="chipTap('get_started')">✦ Birth date se banao instead</button>`;
+    msg.querySelector('.ai-content').appendChild(cr);
+    scrollBottom();
+  }, 1200);
 }
 
 function _startChatRashifal(rashiName) {
