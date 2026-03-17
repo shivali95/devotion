@@ -777,16 +777,16 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 
 /* ── SECTION 2: CURIOSITY HOOKS ── */
 .ls-day-theme { margin:14px 16px 0; border-radius:var(--shape-large);
-  background:linear-gradient(135deg,#1a0a5e,#3900ad); padding:16px;
-  cursor:pointer; border:none; width:calc(100% - 32px); font-family:'JioType',sans-serif;
+  background:#fef7e9; border:1px solid rgba(172,102,12,0.18); padding:16px;
+  cursor:pointer; width:calc(100% - 32px); font-family:'JioType',sans-serif;
   display:flex; flex-direction:column; gap:6px; text-align:left;
-  transition:opacity var(--dur-quick); }
-.ls-day-theme:active { opacity:0.85; }
-.ls-day-theme-eyebrow { font-size:9px; font-weight:800; color:rgba(247,171,32,0.8);
+  transition:background var(--dur-quick); }
+.ls-day-theme:active { background:#ffe3ae; }
+.ls-day-theme-eyebrow { font-size:9px; font-weight:800; color:#ac660c;
   text-transform:uppercase; letter-spacing:0.08em; }
-.ls-day-theme-title { font-size:16px; font-weight:900; color:#fff; line-height:1.25; }
-.ls-day-theme-desc { font-size:12px; color:rgba(255,255,255,0.65); line-height:1.45; margin-top:2px; }
-.ls-day-theme-cta { font-size:12px; color:rgba(247,171,32,0.9); font-weight:700; margin-top:4px; }
+.ls-day-theme-title { font-size:16px; font-weight:900; color:#141414; line-height:1.25; }
+.ls-day-theme-desc { font-size:12px; color:rgba(25,27,30,0.65); line-height:1.45; margin-top:2px; }
+.ls-day-theme-cta { font-size:12px; color:#3535f3; font-weight:700; margin-top:4px; }
 
 .ls-topic-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 16px 0; }
 .ls-topic-card { background:#fff; border:1px solid var(--stroke-subtle);
@@ -3874,8 +3874,8 @@ const CALL_SCRIPT = [
 ];
 
 const DAY_THEME = {
-  title: 'Naye Connections Ke Liye Best Hai Aaj',
-  desc:  'Networking, nayi jagah jaana, nayi logon se milna — sab aaj favourable hai.',
+  title: 'Aaj Shukra ki nazar aap par hai — ye din waste mat karna',
+  desc:  'Love, money aur creativity ke liye ek rare window hai aaj. Aise din kam aate hain.',
 };
 const AVOID_TODAY = 'Bade financial decisions aaj nahi lena — Mangal thoda unfavourable position mein hai.';
 const LANDING_TOPICS = [
@@ -3889,7 +3889,7 @@ const TOPIC_CHAT_DATA = {
   relationship: { userMsg:'Aaj relationship ke liye kaisa din hai?', aiText:'Relationship ke liye aaj <strong>positive energy</strong> hai ❤️ — partner ke saath honest conversation ka sahi samay hai. Shukra ki position bilkul favorable hai.' },
   money:        { userMsg:'Aaj paise ke liye kaisa din hai?',        aiText:'Money ke liye aaj <strong>thoda careful rehna</strong> chahiye ⚠️ — bade investments ya financial decisions avoid karein. Choti expenses pe nazar rakhein.' },
   health:       { userMsg:'Aaj health ke liye kya dhyaan rakhein?',  aiText:'Health ke liye aaj <strong>rest aur recovery</strong> ka din hai 🌿 — body ke signals suno. Overexertion avoid karein, hydration pe dhyaan rakhein.' },
-  day_theme:    { userMsg:'Aaj ka din kaise rahega?',                aiText:'Aaj ka din <strong>naye connections ke liye best</strong> hai ✦ — networking, nayi jagah jaana, logon se milna sab aaj favorable hai. Is energy ko use karo.' },
+  day_theme:    { userMsg:'Aaj Shukra ki nazar hai — kya matlab hai?', aiText:'Aaj <strong>Shukra 7th house</strong> mein favorable position mein hai ✨ — love, creativity aur money moves ke liye rare alignment hai. Aise din mahine mein ek-do baar aate hain. Koi important decision, baat, ya kaam aaj shuru karo — stars support kar rahe hain.' },
   avoid:        { userMsg:'Aaj kya avoid karein?',                   aiText:'Aaj <strong>bade financial decisions</strong> avoid karein ⚠️ — Mangal ki position thodi unfavorable hai. Existing commitments pe focus raho, naye contracts sign na karo.' },
 };
 const LANDING_LIFE_QS = [
