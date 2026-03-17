@@ -903,12 +903,12 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
   display:flex; flex-direction:column; font-family:'JioType',sans-serif; }
 .cs-header { background:linear-gradient(160deg,#00004c,#2d0a8a,#6d17ce);
   padding:28px 20px 24px; display:flex; flex-direction:column; align-items:center; gap:10px; flex-shrink:0; }
-.cs-avatar-ring { width:72px; height:72px; border-radius:50%;
-  background:rgba(247,171,32,0.18); border:2px solid rgba(247,171,32,0.45);
-  display:flex; align-items:center; justify-content:center;
-  animation:cgwPulse 2.8s ease-in-out infinite; }
-.cs-avatar { font-size:28px; color:rgba(247,171,32,0.9); }
-.cs-name { font-size:17px; font-weight:700; color:#fff; letter-spacing:-0.01em; }
+.cs-avatar-ring { width:108px; height:108px; border-radius:50%;
+  border:3px solid rgba(247,171,32,0.7); overflow:hidden;
+  box-shadow:0 0 0 8px rgba(247,171,32,0.12), 0 0 28px rgba(109,23,206,0.5);
+  animation:cgwPulse 2.8s ease-in-out infinite; flex-shrink:0; }
+.cs-avatar-img { width:108px; height:108px; object-fit:cover; border-radius:50%; display:block; }
+.cs-name { font-size:18px; font-weight:800; color:#fff; letter-spacing:-0.01em; margin-top:4px; }
 .cs-status { font-size:12px; color:rgba(255,255,255,0.55); font-family:'JioType',sans-serif; }
 .cs-status.connected { color:#4eff7c; display:flex; align-items:center; gap:5px; }
 .cs-status.connected::before { content:''; width:6px; height:6px; border-radius:50%; background:#4eff7c; flex-shrink:0; }
@@ -1115,10 +1115,10 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
           </div>
         </button>
         <button class="ls-entry-option" onclick="_pickCallFromLanding()">
-          <div class="ls-entry-option-icon">📞</div>
+          <img src="astrologer.png" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(247,171,32,0.5);" alt="Pandit Arun Sharma" />
           <div>
-            <div class="ls-entry-option-title">Call karein</div>
-            <div class="ls-entry-option-desc">AI Astrologer se voice mein seedha baat karo</div>
+            <div class="ls-entry-option-title">Pandit Arun Sharma se baat karein</div>
+            <div class="ls-entry-option-desc">AI Jyotish Advisor • Voice call • Hindi mein</div>
           </div>
         </button>
       </div>
@@ -1156,8 +1156,10 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
   <!-- ── AI CALL SCREEN ── -->
   <div id="callScreen" class="cs-screen" style="display:none;">
     <div class="cs-header">
-      <div class="cs-avatar-ring"><div class="cs-avatar">✦</div></div>
-      <div class="cs-name">AI Jyotish Advisor</div>
+      <div class="cs-avatar-ring">
+        <img class="cs-avatar-img" src="astrologer.png" alt="Pandit Arun Sharma" />
+      </div>
+      <div class="cs-name">Pandit Arun Sharma</div>
       <div class="cs-status" id="csStatus">Connecting...</div>
       <div class="cs-waveform idle" id="csWaveform">
         <div class="cs-bar"></div><div class="cs-bar"></div><div class="cs-bar"></div>
