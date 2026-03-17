@@ -829,15 +829,28 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 .ls-life-q-text { flex:1; font-size:14px; font-weight:600; color:var(--text-high); }
 .ls-life-q-arrow { font-size:20px; color:var(--text-low); }
 
-/* ── CTA BAR: 2-button layout ── */
-.ls-cta-row { display:flex; gap:10px; }
-.ls-cta-half { flex:1; padding:14px 8px; border:none; border-radius:var(--shape-pill);
-  font-family:'JioType',sans-serif; font-size:14px; font-weight:700; color:#fff;
-  cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
-  transition:opacity var(--dur-quick); }
-.ls-cta-half:active { opacity:0.85; }
-.ls-cta-half.chat { background:var(--surface-bold,#3900ad); }
-.ls-cta-half.call { background:linear-gradient(135deg,#1a0a5e,#3d0096); }
+/* ── ENTRY SHEET (chat / call picker) ── */
+.ls-entry-backdrop { position:absolute; inset:0; background:rgba(0,0,0,0.35); z-index:20;
+  opacity:0; transition:opacity 220ms ease; pointer-events:none; }
+.ls-entry-backdrop.open { opacity:1; pointer-events:all; }
+.ls-entry-sheet { position:absolute; bottom:0; left:0; right:0; z-index:21;
+  background:#fff; border-radius:20px 20px 0 0; padding:12px 16px 32px;
+  transform:translateY(100%); transition:transform 260ms var(--ease-standard,ease); }
+.ls-entry-sheet.open { transform:translateY(0); }
+.ls-entry-handle { width:36px; height:4px; background:var(--stroke-subtle);
+  border-radius:2px; margin:0 auto 16px; }
+.ls-entry-title { font-size:13px; font-weight:700; color:var(--text-low);
+  text-align:center; margin-bottom:14px; font-family:'JioType',sans-serif;
+  text-transform:uppercase; letter-spacing:0.06em; }
+.ls-entry-options { display:flex; flex-direction:column; gap:10px; }
+.ls-entry-option { display:flex; align-items:center; gap:14px; padding:14px 16px;
+  border-radius:var(--shape-large); border:1px solid var(--stroke-subtle);
+  background:#fff; cursor:pointer; text-align:left; font-family:'JioType',sans-serif;
+  width:100%; transition:background var(--dur-quick); }
+.ls-entry-option:active { background:var(--surface-minimal,#f5f5f5); }
+.ls-entry-option-icon { font-size:26px; flex-shrink:0; }
+.ls-entry-option-title { font-size:15px; font-weight:700; color:var(--text-high); line-height:1.2; }
+.ls-entry-option-desc { font-size:12px; color:var(--text-low); margin-top:2px; }
 
 .ls-cta-bar { padding:10px 16px 16px; background:#fff; border-top:1px solid var(--stroke-subtle); flex-shrink:0; }
 .ls-cta-btn { width:100%; padding:15px; background:var(--surface-bold,#3900ad);
@@ -1072,9 +1085,28 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
       <div class="ls-life-q-list" id="lsLifeQList"></div>
     </div>
     <div class="ls-cta-bar">
-      <div class="ls-cta-row">
-        <button class="ls-cta-half chat" onclick="enterChatFromLanding()">💬 Chat</button>
-        <button class="ls-cta-half call" onclick="_hideLandingAndStartChat({type:'call'})">📞 Call</button>
+      <button class="ls-cta-btn" onclick="showLandingEntrySheet()">✦ Jyotish Saathi se baat karein</button>
+    </div>
+    <!-- entry sheet -->
+    <div id="lsEntryBackdrop" class="ls-entry-backdrop" onclick="hideLandingEntrySheet()"></div>
+    <div id="lsEntrySheet" class="ls-entry-sheet">
+      <div class="ls-entry-handle"></div>
+      <div class="ls-entry-title">Kaise baat karein?</div>
+      <div class="ls-entry-options">
+        <button class="ls-entry-option" onclick="_pickChatFromLanding()">
+          <div class="ls-entry-option-icon">💬</div>
+          <div>
+            <div class="ls-entry-option-title">Chat karein</div>
+            <div class="ls-entry-option-desc">Type karein — sawaal poochho, answers paao</div>
+          </div>
+        </button>
+        <button class="ls-entry-option" onclick="_pickCallFromLanding()">
+          <div class="ls-entry-option-icon">📞</div>
+          <div>
+            <div class="ls-entry-option-title">Call karein</div>
+            <div class="ls-entry-option-desc">AI Astrologer se voice mein seedha baat karo</div>
+          </div>
+        </button>
       </div>
     </div>
   </div>
@@ -3864,6 +3896,23 @@ const CALL_SCRIPT = [
   {role:'ai',   text:'Haan, bilkul. Abhi Rahu Antardasha chal rahi hai — yeh unexpected connections laata hai. Kundali banwao toh main exact timing bhi bata sakta hoon.'},
 ];
 
+const CHAT_TOPICS_MENU = [
+  { icon:'❤️', label:'Love & Relationships', key:'love' },
+  { icon:'💼', label:'Career & Work',         key:'career_menu' },
+  { icon:'💰', label:'Money & Finance',       key:'money_menu' },
+  { icon:'🌿', label:'Health & Wellness',     key:'health_menu' },
+  { icon:'🏠', label:'Ghar & Family',         key:'home' },
+  { icon:'🔮', label:'Life & Future',         key:'life_future' },
+];
+const TOPIC_MENU_CHAT = {
+  love:         'Pyaar aur relationships ke mamle mein Venus aur 7th house ki sthiti sabse important hoti hai — compatibility, timing, aur connection sab planet se judha hai.',
+  career_menu:  'Career mein success ke liye 10th house, Saturn aur Jupiter ka role sabse bada hota hai. Promotions, switches, business — sab graha sthiti se influenced hai.',
+  money_menu:   'Money aur finance ke liye 2nd aur 11th house key hain. Investments, income growth, debt — sab kundali mein clearly dikhta hai.',
+  health_menu:  'Health ke liye 6th house aur Mars ki position important hoti hai. Energy levels, recovery, chronic issues — sab graha se connected hai.',
+  home:         'Ghar, property aur family ke mamle mein 4th house aur Moon sabse important hain. Griha pravesh, family harmony, property timing — sab yahan se aata hai.',
+  life_future:  'Life path aur future ke baare mein Rahu-Ketu ka trajectory aur Jupiter ki dasha sabse zyada bolta hai — aapka purpose aur destiny clear ho sakta hai.',
+};
+
 const DAY_THEME = {
   title: 'Aaj Shukra ki nazar aap par hai — ye din waste mat karna',
   desc:  'Love, money aur creativity ke liye ek rare window hai aaj. Aise din kam aate hain.',
@@ -3977,7 +4026,18 @@ function landingRashiTapped(i) {
   setTimeout(() => res.scrollIntoView({behavior:'smooth',block:'nearest'}), 100);
 }
 
-function enterChatFromLanding()        { _hideLandingAndStartChat(null); }
+function showLandingEntrySheet() {
+  document.getElementById('lsEntryBackdrop').classList.add('open');
+  document.getElementById('lsEntrySheet').classList.add('open');
+}
+function hideLandingEntrySheet() {
+  document.getElementById('lsEntryBackdrop').classList.remove('open');
+  document.getElementById('lsEntrySheet').classList.remove('open');
+}
+function _pickChatFromLanding()  { hideLandingEntrySheet(); _hideLandingAndStartChat({type:'topic_menu'}); }
+function _pickCallFromLanding()  { hideLandingEntrySheet(); _hideLandingAndStartChat({type:'call'}); }
+
+function enterChatFromLanding()        { showLandingEntrySheet(); }
 function enterChatFromRashifal(name)   { _hideLandingAndStartChat({type:'rashifal', rashi:name}); }
 function landingInsightTapped(ctx)     { _hideLandingAndStartChat({type:'insight', context:ctx}); }
 
@@ -3988,13 +4048,45 @@ function _hideLandingAndStartChat(ctx) {
   setTimeout(() => {
     el.style.display = 'none';
     el.classList.remove('landing-exiting');
-    if (!ctx)                       startWelcome();
-    else if (ctx.type==='rashifal') _startChatRashifal(ctx.rashi);
-    else if (ctx.type==='insight')  _startChatInsight(ctx.context);
-    else if (ctx.type==='call')     showCallScreen();
-    else if (ctx.type==='topic')    _startChatTopic(ctx.topic);
-    else if (ctx.type==='life_q')   _startChatLifeQuestion(ctx.key, ctx.text);
+    if (!ctx)                         startWelcome();
+    else if (ctx.type==='rashifal')   _startChatRashifal(ctx.rashi);
+    else if (ctx.type==='insight')    _startChatInsight(ctx.context);
+    else if (ctx.type==='call')       showCallScreen();
+    else if (ctx.type==='topic')      _startChatTopic(ctx.topic);
+    else if (ctx.type==='life_q')     _startChatLifeQuestion(ctx.key, ctx.text);
+    else if (ctx.type==='topic_menu') _startChatTopicMenu();
   }, 360);
+}
+
+function _startChatTopicMenu() {
+  setTimeout(() => {
+    const msg = aiMessage('Namaste! Aap kiske baare mein jaanna chahte hain? 🔮', false, false);
+    const cr = document.createElement('div'); cr.className = 'chip-row';
+    cr.innerHTML = CHAT_TOPICS_MENU.map((t, i) =>
+      `<button class="chip chip-appear-${i+1}" onclick="_startChatFromTopicKey('${t.key}')">${t.icon} ${t.label}</button>`
+    ).join('');
+    msg.querySelector('.ai-content').appendChild(cr);
+    scrollBottom();
+  }, 500);
+}
+
+function _startChatFromTopicKey(key) {
+  const topic = CHAT_TOPICS_MENU.find(t => t.key === key);
+  const teaser = TOPIC_MENU_CHAT[key] || TOPIC_MENU_CHAT.life_future;
+  userMessage(topic ? `${topic.icon} ${topic.label}` : key);
+  showThinkingThen(() => {
+    const msg = aiMessage(
+      `<p>${teaser}</p>
+       <p>Main aapko bahut kuch bata sakta hoon — lekin <strong>aapki personal kundali</strong> ho toh exact timing, specific guidance aur sahi answers mil sakte hain.</p>
+       <p>Kya aap apni <strong>birth date, time aur jagah</strong> share karenge? Main abhi kundali banata hoon 🔮</p>`,
+      false, false);
+    const cr = document.createElement('div'); cr.className = 'chip-row';
+    cr.innerHTML = `
+      <button class="chip cta chip-appear-1" onclick="chipTap('get_started')">✦ Kundali banao</button>
+      <button class="chip chip-appear-2" onclick="_startChatTopicMenu()">Aur topics dekhein</button>`;
+    msg.querySelector('.ai-content').appendChild(cr);
+    scrollBottom();
+  }, 1400);
 }
 
 function _startChatRashifal(rashiName) {
