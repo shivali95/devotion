@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kundali Milan — Jyotish Saathi</title>
+<style>
+@font-face { font-family:'JioType'; font-weight:400; src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
+@font-face { font-family:'JioType'; font-weight:500; src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2'); }
+@font-face { font-family:'JioType'; font-weight:700; src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Bold.woff2') format('woff2'); }
+@font-face { font-family:'JioType'; font-weight:900; src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Black.woff2') format('woff2'); }
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body {
+  background:#e8e8e8;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:32px 24px 80px;
+  font-family:'JioType',sans-serif;
+  min-height:100vh;
+}
+
+/* ── Phone frame ── */
+.phone {
+  width:360px;
+  background:#fff;
+  border-radius:40px;
+  border:8px solid #1a1a1a;
+  box-shadow:0 24px 64px rgba(0,0,0,0.22);
+  overflow:hidden;
+  position:relative;
+  flex-shrink:0;
+}
+.notch {
+  background:#1a1a1a;height:32px;
+  display:flex;align-items:center;justify-content:center;
+}
+.notch-inner {
+  width:80px;height:20px;background:#1a1a1a;border-radius:0 0 14px 14px;
+}
+.status-bar {
+  background:#fff;padding:6px 20px;
+  display:flex;justify-content:space-between;
+  font-size:11px;font-weight:600;color:#141414;
+}
+
+/* ── Header ── */
+.header-nav {
+  background:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px 10px;
+  border-bottom:1px solid #f0f0f0;
+  position:sticky;top:0;z-index:100;
+}
+.header-left { display:flex;align-items:center;gap:8px; }
+.back-btn {
+  width:36px;height:36px;border:none;background:#eeeeef;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  text-decoration:none;color:#141414;flex-shrink:0;
+}
+.back-btn svg { width:20px;height:20px;fill:#141414; }
+.header-title { font-size:16px;font-weight:700;color:#141414; }
+.header-sub { font-size:11px;color:#888;font-weight:400;margin-top:1px; }
+
+/* ── Chat container ── */
+.chat-container {
+  height:648px;
+  overflow-y:auto;
+  padding:16px 12px 20px;
+  display:flex;flex-direction:column;gap:4px;
+  background:#fafafa;
+  scroll-behavior:smooth;
+}
+.chat-container::-webkit-scrollbar{display:none;}
+
+/* ── Messages ── */
+.ai-row { display:flex;gap:8px;align-items:flex-start;margin-bottom:4px; }
+.ai-avatar {
+  width:28px;height:28px;border-radius:50%;background:#3535f3;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;margin-top:2px;font-size:14px;
+}
+.ai-bubble {
+  background:#fff;border-radius:4px 16px 16px 16px;
+  padding:10px 12px;max-width:270px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  font-size:14px;color:#141414;line-height:1.5;
+}
+.user-bubble {
+  background:#3535f3;color:#fff;
+  border-radius:16px 4px 16px 16px;
+  padding:10px 14px;font-size:14px;line-height:1.5;
+  align-self:flex-end;max-width:240px;
+  margin-bottom:4px;
+}
+
+/* ── Chips ── */
+.chip-row {
+  display:flex;flex-wrap:wrap;gap:8px;
+  padding:6px 0 2px 36px;
+}
+.chip {
+  background:#fff;border:1.5px solid #e0e0e0;border-radius:999px;
+  padding:7px 14px;font-size:13px;font-weight:500;color:#141414;
+  cursor:pointer;font-family:'JioType',sans-serif;
+  transition:all 0.15s;white-space:nowrap;
+}
+.chip:active{background:#eeeeef;}
+.chip.cta {
+  background:#3535f3;color:#fff;border-color:#3535f3;
+}
+.chip.cta:active{background:#2828cc;}
+.chip.warn-chip {
+  border-color:#f7ab20;color:#c47e00;background:#fffbf0;
+}
+
+/* ── Thinking dots ── */
+.thinking-row { display:flex;gap:8px;align-items:flex-start;margin-bottom:4px; }
+.thinking-bubble {
+  background:#fff;border-radius:4px 16px 16px 16px;
+  padding:12px 16px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  display:flex;gap:5px;align-items:center;
+}
+.dot {
+  width:7px;height:7px;border-radius:50%;background:#ccc;
+  animation:bounce 1.2s infinite;
+}
+.dot:nth-child(2){animation-delay:0.2s;}
+.dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);}40%{transform:translateY(-6px);background:#3535f3;}}
+
+/* ── Form card ── */
+.form-card {
+  background:#fff;border-radius:16px;
+  border:1px solid rgba(36,38,43,0.12);
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
+  overflow:hidden;max-width:290px;
+}
+.form-card-header {
+  background:#3535f3;padding:10px 14px;
+  display:flex;align-items:center;gap:8px;
+}
+.form-card-header span { font-size:13px;font-weight:700;color:#fff; }
+.form-cols {
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:0;
+}
+.form-col {
+  padding:10px 10px 12px;
+  border-right:1px solid #f0f0f0;
+}
+.form-col:last-child{border-right:none;}
+.form-col-label {
+  font-size:11px;font-weight:700;color:#3535f3;
+  text-transform:uppercase;letter-spacing:0.04em;
+  margin-bottom:8px;display:flex;align-items:center;gap:4px;
+}
+.field-group { margin-bottom:8px; }
+.field-label { font-size:10px;color:#888;font-weight:500;margin-bottom:3px; }
+.field-input {
+  background:#eeeeef;border-radius:8px;border:none;
+  padding:6px 8px;font-size:12px;font-family:'JioType',sans-serif;
+  color:#141414;width:100%;outline:none;
+}
+.field-input:focus{background:#e0e0ff;}
+.form-footer {
+  padding:10px 12px;border-top:1px solid #f0f0f0;
+  display:flex;gap:8px;align-items:center;
+}
+.or-text{font-size:11px;color:#aaa;flex-shrink:0;}
+.upload-btn {
+  background:#eeeeef;border:none;border-radius:8px;
+  padding:6px 10px;font-size:11px;font-weight:600;color:#555;
+  cursor:pointer;font-family:'JioType',sans-serif;
+  display:flex;align-items:center;gap:4px;
+}
+.match-btn {
+  background:#3535f3;border:none;border-radius:999px;
+  padding:10px 0;font-size:14px;font-weight:700;color:#fff;
+  cursor:pointer;font-family:'JioType',sans-serif;
+  width:100%;margin-top:10px;
+}
+.match-btn:active{background:#2828cc;}
+
+/* ── Gen steps ── */
+.gen-bubble {
+  background:#fff;border-radius:4px 16px 16px 16px;
+  padding:10px 14px;max-width:270px;
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  font-size:13px;color:#888;
+}
+.gen-step {
+  display:flex;align-items:center;gap:8px;
+  padding:4px 0;font-size:12px;color:#888;
+  opacity:0;transform:translateY(4px);
+  transition:opacity 0.3s, transform 0.3s;
+}
+.gen-step.active{opacity:1;transform:translateY(0);}
+.gen-step.done{color:#25ab21;}
+.gen-step .step-dot {
+  width:8px;height:8px;border-radius:50%;background:#e0e0e0;flex-shrink:0;
+}
+.gen-step.done .step-dot{background:#25ab21;}
+.gen-step.active .step-dot{background:#3535f3;animation:pulse 0.8s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* ── Score card ── */
+.score-card {
+  background:#fff;border-radius:16px;
+  border:1px solid rgba(36,38,43,0.12);
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
+  overflow:hidden;max-width:290px;
+  animation:slideUp 0.4s ease;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+
+.score-header {
+  background:#3900ad;padding:16px;
+  display:flex;align-items:center;gap:14px;
+}
+.score-ring {
+  width:64px;height:64px;flex-shrink:0;
+}
+.score-ring svg{width:64px;height:64px;}
+.score-info { flex:1; }
+.score-names { font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:2px; }
+.score-num { font-size:28px;font-weight:900;color:#fff;line-height:1; }
+.score-label { font-size:11px;color:rgba(255,255,255,0.6); }
+.score-verdict {
+  font-size:13px;font-weight:700;color:#f7ab20;
+  margin-top:4px;display:flex;align-items:center;gap:4px;
+}
+
+.highlights { padding:12px 14px; }
+.highlight-item {
+  display:flex;align-items:flex-start;gap:8px;
+  padding:6px 0;border-bottom:1px solid #f5f5f5;
+  font-size:12px;color:#444;line-height:1.4;
+}
+.highlight-item:last-child{border-bottom:none;}
+.hi-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+.hi-text strong{color:#141414;font-weight:700;}
+
+/* ── Koot table ── */
+.koot-toggle {
+  width:100%;background:none;border:none;border-top:1px solid #f0f0f0;
+  padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;font-weight:700;color:#3535f3;cursor:pointer;
+  font-family:'JioType',sans-serif;
+}
+.koot-table { display:none; }
+.koot-table.open { display:block; }
+.koot-row {
+  display:flex;align-items:center;padding:7px 14px;
+  border-bottom:1px solid #f8f8f8;font-size:12px;
+}
+.koot-row:last-child{border-bottom:none;}
+.koot-name{flex:1;color:#555;font-weight:500;}
+.koot-score{font-weight:700;color:#141414;width:36px;text-align:right;}
+.koot-bar-wrap{flex:1;margin:0 10px;height:4px;background:#f0f0f0;border-radius:2px;}
+.koot-bar{height:4px;border-radius:2px;}
+.koot-icon{width:18px;text-align:center;font-size:11px;}
+
+/* ── Astrologer card ── */
+.astro-card {
+  background:#fff;border-radius:16px;
+  border:1px solid rgba(36,38,43,0.12);
+  box-shadow:0 4px 16px rgba(0,0,0,0.08);
+  padding:14px;max-width:290px;
+  display:flex;gap:12px;align-items:center;
+}
+.astro-avatar {
+  width:44px;height:44px;border-radius:50%;background:#e7e9ff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.astro-info { flex:1; }
+.astro-name{font-size:13px;font-weight:700;color:#141414;}
+.astro-sub{font-size:11px;color:#888;margin-top:1px;}
+.astro-context{font-size:11px;color:#3535f3;margin-top:4px;font-weight:500;}
+.astro-cta {
+  background:#3535f3;border:none;border-radius:999px;
+  padding:8px 14px;font-size:12px;font-weight:700;color:#fff;
+  cursor:pointer;font-family:'JioType',sans-serif;flex-shrink:0;
+}
+
+/* ── Bottom input ── */
+.chat-input-bar {
+  background:#fff;padding:10px 12px;
+  border-top:1px solid #f0f0f0;
+  display:flex;align-items:center;gap:8px;
+}
+.chat-input {
+  flex:1;background:#eeeeef;border:none;border-radius:23px;
+  padding:9px 14px;font-size:14px;font-family:'JioType',sans-serif;
+  color:#141414;outline:none;
+}
+.chat-input::placeholder{color:#aaa;}
+.send-btn {
+  width:36px;height:36px;border-radius:50%;background:#3535f3;border:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;
+}
+.send-btn svg{width:18px;height:18px;fill:#fff;}
+
+/* ── PDF bottom sheet ── */
+.sheet-backdrop {
+  position:absolute;inset:0;background:rgba(0,0,0,0.4);z-index:300;
+  display:none;align-items:flex-end;
+}
+.sheet-backdrop.open{display:flex;}
+.pdf-sheet {
+  background:#fff;border-radius:16px 16px 0 0;width:100%;
+  padding:20px 20px 32px;
+}
+.sheet-handle {
+  width:32px;height:4px;background:#e0e0e0;border-radius:2px;
+  margin:0 auto 16px;
+}
+.sheet-title{font-size:16px;font-weight:700;color:#141414;margin-bottom:4px;}
+.sheet-sub{font-size:13px;color:#888;margin-bottom:20px;}
+.sheet-options{display:flex;flex-direction:column;gap:10px;}
+.sheet-option {
+  display:flex;align-items:center;gap:12px;
+  padding:14px;background:#fafafa;border-radius:12px;
+  border:1px solid #f0f0f0;cursor:pointer;
+}
+.sheet-option:active{background:#f0f0f0;}
+.sheet-opt-icon {
+  width:40px;height:40px;border-radius:10px;background:#e7e9ff;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.sheet-opt-icon svg{width:20px;height:20px;fill:#3535f3;}
+.sheet-opt-label{font-size:14px;font-weight:600;color:#141414;}
+.sheet-opt-sub{font-size:12px;color:#888;margin-top:1px;}
+
+/* ── Toast ── */
+.toast {
+  position:absolute;bottom:80px;left:50%;transform:translateX(-50%);
+  background:#141414;color:#fff;border-radius:12px;
+  padding:10px 16px;font-size:13px;font-weight:500;
+  white-space:nowrap;z-index:400;
+  animation:toastIn 0.3s ease;display:none;
+}
+.toast.show{display:block;}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px);}to{opacity:1;transform:translate(-50%,0);}}
+
+/* ── Feedback row ── */
+.feedback-row {
+  display:flex;gap:12px;padding:4px 0 2px 36px;
+  align-items:center;
+}
+.fb-btn {
+  background:none;border:none;cursor:pointer;
+  display:flex;align-items:center;gap:4px;
+  font-size:11px;color:#aaa;font-family:'JioType',sans-serif;
+  padding:0;
+}
+.fb-btn svg{width:14px;height:14px;fill:#ccc;}
+.fb-btn:hover svg{fill:#3535f3;}
+
+/* ── Entrance animations ── */
+.msg-enter { animation:msgIn 0.3s ease both; }
+@keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.chip-appear-1{animation:chipIn 0.25s 0.05s ease both;}
+.chip-appear-2{animation:chipIn 0.25s 0.12s ease both;}
+.chip-appear-3{animation:chipIn 0.25s 0.19s ease both;}
+.chip-appear-4{animation:chipIn 0.25s 0.26s ease both;}
+@keyframes chipIn{from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
+</style>
+</head>
+<body>
+<div class="phone">
+  <!-- Notch -->
+  <div class="notch"><div class="notch-inner"></div></div>
+  <!-- Status bar -->
+  <div class="status-bar"><span>9:41</span><span>●●● ▲ ▮▮</span></div>
+
+  <!-- Header -->
+  <div class="header-nav">
+    <div class="header-left">
+      <a class="back-btn" href="https://sunit1986.github.io/design-prototypes/jyotish-saathi.html" aria-label="Back">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M15 20a1.003 1.003 0 01-.71-.29l-7-7a1 1 0 010-1.42l7-7a1.005 1.005 0 011.42 1.42L9.41 12l6.3 6.29a.997.997 0 01.219 1.095.999.999 0 01-.93.615z" fill="currentColor"/></svg>
+      </a>
+      <div>
+        <div class="header-title">Kundali Milan</div>
+        <div class="header-sub">AI Compatibility Analysis</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-container" id="CC">
+
+    <!-- AI welcome -->
+    <div class="ai-row msg-enter">
+      <div class="ai-avatar">🔮</div>
+      <div class="ai-bubble">
+        Namasté! 🙏 Enter birth details for <strong>both people</strong> and I'll analyse their Kundali Milan — Gun Milan score, compatibility strengths, concerns, and more.
+      </div>
+    </div>
+
+    <!-- Form card -->
+    <div class="ai-row msg-enter" style="animation-delay:0.15s" id="formRow">
+      <div class="ai-avatar" style="visibility:hidden;width:28px;flex-shrink:0;"></div>
+      <div>
+        <div class="form-card">
+          <div class="form-card-header">
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm5.21 7.71l-6 6a1.002 1.002 0 01-1.42 0l-3-3a1.003 1.003 0 111.42-1.42l2.29 2.3 5.29-5.3a1.004 1.004 0 011.42 1.42z" fill="#fff"/></svg>
+            <span>Birth Details</span>
+          </div>
+          <div class="form-cols">
+            <!-- Person 1 -->
+            <div class="form-col">
+              <div class="form-col-label">👤 Person 1</div>
+              <div class="field-group">
+                <div class="field-label">Full Name</div>
+                <input class="field-input" id="p1name" type="text" placeholder="e.g. Arjun" value="Arjun Sharma">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Date of Birth</div>
+                <input class="field-input" id="p1dob" type="text" placeholder="DD/MM/YYYY" value="15/08/1995">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Time of Birth</div>
+                <input class="field-input" id="p1tob" type="text" placeholder="HH:MM AM/PM" value="10:30 AM">
+              </div>
+              <div class="field-group">
+                <div class="field-label">City</div>
+                <input class="field-input" id="p1city" type="text" placeholder="City" value="Mumbai">
+              </div>
+            </div>
+            <!-- Person 2 -->
+            <div class="form-col">
+              <div class="form-col-label">👤 Person 2</div>
+              <div class="field-group">
+                <div class="field-label">Full Name</div>
+                <input class="field-input" id="p2name" type="text" placeholder="e.g. Priya" value="Priya Verma">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Date of Birth</div>
+                <input class="field-input" id="p2dob" type="text" placeholder="DD/MM/YYYY" value="22/03/1997">
+              </div>
+              <div class="field-group">
+                <div class="field-label">Time of Birth</div>
+                <input class="field-input" id="p2tob" type="text" placeholder="HH:MM AM/PM" value="06:15 AM">
+              </div>
+              <div class="field-group">
+                <div class="field-label">City</div>
+                <input class="field-input" id="p2city" type="text" placeholder="City" value="Delhi">
+              </div>
+            </div>
+          </div>
+          <div style="padding:0 12px 12px;">
+            <button class="match-btn" onclick="startMatching()">✨ Match Kundali</button>
+          </div>
+          <div class="form-footer">
+            <span class="or-text">or</span>
+            <button class="upload-btn" onclick="showToast('PDF upload coming soon')">
+              <svg viewBox="0 0 24 24" fill="none" width="13" height="13"><path d="M13 6V2H7.5A2.5 2.5 0 005 4.5v15A2.5 2.5 0 007.5 22h10a2.5 2.5 0 002.5-2.5V9h-4a3 3 0 01-3-3zm3 1h4a2 2 0 00-.59-1.41l-3-3A2 2 0 0015 2v4a1 1 0 001 1z" fill="currentColor"/></svg>
+              Upload Kundali PDFs
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /chat -->
+
+  <!-- Chat input -->
+  <div class="chat-input-bar">
+    <input class="chat-input" placeholder="Ask about compatibility…" id="chatInput">
+    <button class="send-btn" onclick="handleUserInput()">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M3.4 20.4l17.45-7.48a1 1 0 000-1.84L3.4 3.6a.993.993 0 00-1.4.92l-.01 4.74c0 .5.37.93.87.99L17 12 2.86 13.74c-.5.06-.87.49-.87.99l.01 4.74c0 .71.73 1.2 1.4.93z" fill="currentColor"/></svg>
+    </button>
+  </div>
+
+  <!-- PDF bottom sheet -->
+  <div class="sheet-backdrop" id="pdfSheet" onclick="closePdfSheet(event)">
+    <div class="pdf-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Share Kundali Milan Report</div>
+      <div class="sheet-sub">Arjun Sharma &amp; Priya Verma · 28/36</div>
+      <div class="sheet-options">
+        <div class="sheet-option" onclick="showToast('Downloading PDF…'); setTimeout(closePdf, 1500)">
+          <div class="sheet-opt-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M13 6V2H7.5A2.5 2.5 0 005 4.5v15A2.5 2.5 0 007.5 22h10a2.5 2.5 0 002.5-2.5V9h-4a3 3 0 01-3-3zm3 1h4a2 2 0 00-.59-1.41l-3-3A2 2 0 0015 2v4a1 1 0 001 1z" fill="currentColor"/></svg>
+          </div>
+          <div>
+            <div class="sheet-opt-label">Download PDF</div>
+            <div class="sheet-opt-sub">Save to phone · 2 pages</div>
+          </div>
+        </div>
+        <div class="sheet-option" onclick="showToast('Sharing via WhatsApp…'); setTimeout(closePdf, 1500)">
+          <div class="sheet-opt-icon" style="background:#e6f9ee;">
+            <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><path d="M2 22l1.41-5.15A9.97 9.97 0 112 22zm9.95-17a8 8 0 100 16 8 8 0 000-16zm4.07 11.23c-.18.52-.88.95-1.47 1.08-.39.08-.9.15-2.62-.56-2.21-.9-3.63-3.14-3.74-3.28-.11-.14-.89-1.19-.89-2.27 0-1.08.57-1.61.77-1.83.2-.22.44-.27.59-.27h.42c.14 0 .33-.05.51.39.19.46.64 1.56.7 1.67.06.11.1.24.02.38-.08.14-.12.23-.23.35-.11.12-.24.27-.34.36-.11.09-.23.2-.1.4.13.2.58.96 1.25 1.56.86.77 1.58 1.01 1.8 1.12.22.11.35.09.48-.05.13-.14.56-.65.71-.87.15-.22.3-.18.5-.11.2.07 1.29.61 1.51.72.22.11.37.17.42.26.06.09.06.52-.12 1.04z" fill="#25ab21"/></svg>
+          </div>
+          <div>
+            <div class="sheet-opt-label">Share on WhatsApp</div>
+            <div class="sheet-opt-sub">Send to family or partner</div>
+          </div>
+        </div>
+        <div class="sheet-option" onclick="showToast('Link copied!'); setTimeout(closePdf, 1200)">
+          <div class="sheet-opt-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12.33 8.82V6H4.87A1.88 1.88 0 003 7.88v12.24A1.88 1.88 0 004.87 22h10.26A1.88 1.88 0 0017 20.12v-9.41h-2.8a1.88 1.88 0 01-1.87-1.89zm8.08-3.23l-3-3A2 2 0 0016 2H8a2 2 0 00-2 2h7a3 3 0 012.12.88l3 3A3 3 0 0119 10v9a2 2 0 002-2V7a2 2 0 00-.59-1.41z" fill="currentColor"/></svg>
+          </div>
+          <div>
+            <div class="sheet-opt-label">Copy Link</div>
+            <div class="sheet-opt-sub">Share anywhere</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+</div><!-- /phone -->
+
+<script>
+const CC = document.getElementById('CC');
+function scrollBottom(){ CC.scrollTo({top:CC.scrollHeight,behavior:'smooth'}); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function userMessage(text) {
+  const d = document.createElement('div');
+  d.className = 'user-bubble msg-enter';
+  d.textContent = text;
+  CC.appendChild(d);
+  scrollBottom();
+}
+
+function aiMessage(html, withFeedback=true) {
+  const row = document.createElement('div');
+  row.className = 'ai-row msg-enter';
+  row.innerHTML = `
+    <div class="ai-avatar">🔮</div>
+    <div class="ai-bubble ai-content">${html}</div>
+  `;
+  CC.appendChild(row);
+  if(withFeedback) {
+    const fb = document.createElement('div');
+    fb.className = 'feedback-row';
+    fb.innerHTML = `
+      <button class="fb-btn" onclick="showToast('Helpful!')"><svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button>
+      <button class="fb-btn" onclick="showToast('Noted')"><svg viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg></button>
+    `;
+    CC.appendChild(fb);
+  }
+  scrollBottom();
+  return row;
+}
+
+function showThinkingThen(cb, delay=1800) {
+  const row = document.createElement('div');
+  row.className = 'thinking-row msg-enter';
+  row.innerHTML = `
+    <div class="ai-avatar">🔮</div>
+    <div class="thinking-bubble">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>`;
+  CC.appendChild(row);
+  scrollBottom();
+  setTimeout(()=>{ row.remove(); cb(); }, delay);
+}
+
+// ── Main flow ──
+function startMatching() {
+  const p1 = document.getElementById('p1name').value || 'Person 1';
+  const p2 = document.getElementById('p2name').value || 'Person 2';
+  document.getElementById('formRow').remove();
+
+  userMessage(`Match Kundali for ${p1} & ${p2}`);
+
+  showThinkingThen(() => showGenSteps(p1, p2), 600);
+}
+
+function showGenSteps(p1, p2) {
+  const row = document.createElement('div');
+  row.className = 'ai-row msg-enter';
+  row.innerHTML = `
+    <div class="ai-avatar">🔮</div>
+    <div class="gen-bubble" id="genBubble">
+      <div style="font-size:13px;font-weight:700;color:#141414;margin-bottom:8px;">Analysing Kundalis…</div>
+      <div class="gen-step" id="gs1"><div class="step-dot"></div>Calculating Rashi &amp; Nakshatra positions</div>
+      <div class="gen-step" id="gs2"><div class="step-dot"></div>Running Gun Milan (8-koot analysis)</div>
+      <div class="gen-step" id="gs3"><div class="step-dot"></div>Checking Dosha &amp; planetary compatibility</div>
+    </div>`;
+  CC.appendChild(row);
+  scrollBottom();
+
+  setTimeout(()=>{ document.getElementById('gs1').classList.add('active'); scrollBottom(); }, 200);
+  setTimeout(()=>{ document.getElementById('gs1').classList.add('done'); document.getElementById('gs2').classList.add('active'); scrollBottom(); }, 1100);
+  setTimeout(()=>{ document.getElementById('gs2').classList.add('done'); document.getElementById('gs3').classList.add('active'); scrollBottom(); }, 2000);
+  setTimeout(()=>{ document.getElementById('gs3').classList.add('done'); scrollBottom(); }, 2800);
+  setTimeout(()=>{ row.remove(); showResults(p1, p2); }, 3400);
+}
+
+function showResults(p1, p2) {
+  // Score summary
+  const scoreRow = document.createElement('div');
+  scoreRow.className = 'ai-row msg-enter';
+  scoreRow.innerHTML = `
+    <div class="ai-avatar">🔮</div>
+    <div class="score-card">
+      <div class="score-header">
+        <div class="score-ring">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="6"/>
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#f7ab20" stroke-width="6"
+              stroke-dasharray="163" stroke-dashoffset="37" stroke-linecap="round"
+              transform="rotate(-90 32 32)" style="transition:stroke-dashoffset 1s ease;"/>
+            <text x="32" y="37" text-anchor="middle" fill="#fff" font-family="JioType,sans-serif" font-size="15" font-weight="900">28</text>
+          </svg>
+        </div>
+        <div class="score-info">
+          <div class="score-names">${p1} &amp; ${p2}</div>
+          <div style="display:flex;align-items:baseline;gap:4px;">
+            <div class="score-num">28</div>
+            <div class="score-label">&nbsp;/ 36 points</div>
+          </div>
+          <div class="score-verdict">✨ Strong Match</div>
+        </div>
+      </div>
+
+      <div class="highlights">
+        <div class="highlight-item">
+          <span class="hi-icon">✅</span>
+          <span class="hi-text"><strong>Graha Maitri 5/5</strong> — Exceptional mental compatibility. Shared values, thinking style and emotional wavelength.</span>
+        </div>
+        <div class="highlight-item">
+          <span class="hi-icon">✅</span>
+          <span class="hi-text"><strong>Bhakoot 7/7</strong> — Strong financial &amp; family harmony. Wealth grows together after marriage.</span>
+        </div>
+        <div class="highlight-item">
+          <span class="hi-icon">⚠️</span>
+          <span class="hi-text"><strong>Nadi 2/8</strong> — Low Nadi score. Health of children may need attention. Remedy available.</span>
+        </div>
+      </div>
+
+      <button class="koot-toggle" onclick="toggleKoot(this)">
+        <span>See all 8 Gun Milan matches</span>
+        <svg viewBox="0 0 24 24" fill="none" width="16" height="16"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" fill="#3535f3"/></svg>
+      </button>
+      <div class="koot-table" id="kootTable">
+        ${kootRow('Varna',1,1,'#25ab21')}
+        ${kootRow('Vashya',2,2,'#25ab21')}
+        ${kootRow('Tara',3,3,'#25ab21')}
+        ${kootRow('Yoni',3,4,'#f7ab20')}
+        ${kootRow('Graha Maitri',5,5,'#25ab21')}
+        ${kootRow('Gana',5,6,'#f7ab20')}
+        ${kootRow('Bhakoot',7,7,'#25ab21')}
+        ${kootRow('Nadi',2,8,'#fa2f40')}
+        <div style="padding:8px 14px;background:#f8f8f8;font-size:12px;font-weight:700;color:#141414;display:flex;justify-content:space-between;">
+          <span>Total</span><span>28 / 36</span>
+        </div>
+      </div>
+    </div>`;
+  CC.appendChild(scoreRow);
+  scrollBottom();
+
+  // Feedback
+  const fb = document.createElement('div');
+  fb.className = 'feedback-row';
+  fb.innerHTML = `
+    <button class="fb-btn" onclick="showToast('Helpful!')"><svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg></button>
+    <button class="fb-btn" onclick="showToast('Noted')"><svg viewBox="0 0 24 24"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg></button>`;
+  CC.appendChild(fb);
+
+  // Astrologer card
+  setTimeout(()=>{
+    const aRow = document.createElement('div');
+    aRow.className = 'ai-row msg-enter';
+    aRow.innerHTML = `
+      <div class="ai-avatar" style="visibility:hidden;width:28px;flex-shrink:0;"></div>
+      <div class="astro-card">
+        <div class="astro-avatar">🧘</div>
+        <div class="astro-info">
+          <div class="astro-name">Talk to an Astrologer</div>
+          <div class="astro-sub">Picks up from this analysis</div>
+          <div class="astro-context">✦ Kundali &amp; score already shared</div>
+        </div>
+        <button class="astro-cta" onclick="showAstrologerConnect()">Connect</button>
+      </div>`;
+    CC.appendChild(aRow);
+    scrollBottom();
+
+    // Chips
+    setTimeout(()=>{
+      const cr = document.createElement('div');
+      cr.className = 'chip-row';
+      cr.innerHTML = `
+        <button class="chip chip-appear-1" onclick="askNadi()">Why is Nadi low?</button>
+        <button class="chip chip-appear-2" onclick="askMeaning()">What does 28/36 mean?</button>
+        <button class="chip chip-appear-3 cta" onclick="openPdfSheet()">Share as PDF</button>
+        <button class="chip chip-appear-4 warn-chip" onclick="askRemedy()">Nadi remedy?</button>`;
+      CC.appendChild(cr);
+      scrollBottom();
+    }, 300);
+  }, 500);
+}
+
+function kootRow(name, score, max, color) {
+  const pct = Math.round((score/max)*100);
+  const icon = score === max ? '✅' : score >= max*0.6 ? '⚠️' : '❌';
+  return `<div class="koot-row">
+    <div class="koot-name">${name}</div>
+    <div class="koot-bar-wrap"><div class="koot-bar" style="width:${pct}%;background:${color};"></div></div>
+    <div class="koot-score">${score}/${max}</div>
+    <div class="koot-icon">${icon}</div>
+  </div>`;
+}
+
+function toggleKoot(btn) {
+  const t = document.getElementById('kootTable');
+  t.classList.toggle('open');
+  const svg = btn.querySelector('svg path');
+  svg.setAttribute('d', t.classList.contains('open')
+    ? 'M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z'
+    : 'M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z');
+  scrollBottom();
+}
+
+function askNadi() {
+  userMessage('Why is Nadi score low?');
+  showThinkingThen(()=>{
+    aiMessage(`<strong>Nadi Dosha</strong> occurs when both partners share the same Nadi — Adi, Madhya, or Antya.<br><br>Arjun and Priya both have <strong>Antya Nadi</strong>, which traditionally signals potential health challenges for children and overall vitality.<br><br>However, their score is <strong>2/8</strong> (not 0), meaning partial cancellation applies — their Rashi lords are friendly, which reduces the severity considerably. 🙏`);
+    const cr = document.createElement('div');
+    cr.className = 'chip-row';
+    cr.innerHTML = `
+      <button class="chip chip-appear-1" onclick="askRemedy()">What remedy helps?</button>
+      <button class="chip chip-appear-2" onclick="askMeaning()">Is 28/36 still good?</button>`;
+    CC.appendChild(cr);
+    scrollBottom();
+  });
+}
+
+function askMeaning() {
+  userMessage('What does 28/36 mean for us?');
+  showThinkingThen(()=>{
+    aiMessage(`<strong>28/36 is an excellent score</strong> — it places Arjun and Priya in the top tier of compatibility. 🌟<br><br>Traditional benchmarks:<br>• <strong>18–24</strong> — Acceptable match<br>• <strong>24–32</strong> — Good to excellent ✅<br>• <strong>32+</strong> — Very rare, exceptional<br><br>At 28, they have strong mental harmony (Graha Maitri 5/5), excellent financial compatibility (Bhakoot 7/7), and the Nadi concern is partially cancelled. Most astrologers would give a <strong>positive recommendation</strong> for this match.`);
+    const cr = document.createElement('div');
+    cr.className = 'chip-row';
+    cr.innerHTML = `
+      <button class="chip chip-appear-1" onclick="askRemedy()">Remedy for Nadi?</button>
+      <button class="chip chip-appear-2 cta" onclick="openPdfSheet()">Download this report</button>`;
+    CC.appendChild(cr);
+    scrollBottom();
+  });
+}
+
+function askRemedy() {
+  userMessage('What is the remedy for Nadi Dosha?');
+  showThinkingThen(()=>{
+    aiMessage(`The most commonly prescribed remedy for <strong>Nadi Dosha</strong> is the <strong>Nadi Nivarana Puja</strong> — performed before the wedding by a qualified priest.<br><br>Additionally:<br>• Donate gold to a temple on the wedding day<br>• Recite <strong>Mahamrityunjaya Mantra</strong> 108 times daily for 40 days<br>• Feed cows on auspicious days (Ekadashi)<br><br>Since their score is 2/8 and not 0, the dosha is <em>partial</em> — a single puja is typically sufficient. 🙏`);
+    const cr = document.createElement('div');
+    cr.className = 'chip-row';
+    cr.innerHTML = `
+      <button class="chip chip-appear-1" onclick="showAstrologerConnect()">Talk to Astrologer</button>
+      <button class="chip chip-appear-2 cta" onclick="openPdfSheet()">Share as PDF</button>`;
+    CC.appendChild(cr);
+    scrollBottom();
+  });
+}
+
+function showAstrologerConnect() {
+  userMessage('Connect me to an astrologer');
+  showThinkingThen(()=>{
+    const row = document.createElement('div');
+    row.className = 'ai-row msg-enter';
+    row.innerHTML = `
+      <div class="ai-avatar">🔮</div>
+      <div class="ai-bubble ai-content">
+        I've shared the full Kundali Milan report — score, 8-koot breakdown, and Nadi concern — with the astrologer. They'll continue right from here. 🙏
+        <div style="margin-top:10px;background:#f5f5f5;border-radius:10px;padding:10px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:40px;height:40px;border-radius:50%;background:#e7e9ff;display:flex;align-items:center;justify-content:center;font-size:20px;">🧘</div>
+            <div>
+              <div style="font-size:13px;font-weight:700;color:#141414;">Pandit Rajesh Sharma</div>
+              <div style="font-size:11px;color:#25ab21;font-weight:600;">● Available now</div>
+              <div style="font-size:11px;color:#888;">22 yrs exp · Hindi &amp; English</div>
+            </div>
+          </div>
+          <button style="margin-top:10px;width:100%;background:#3535f3;border:none;border-radius:999px;padding:9px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;font-family:'JioType',sans-serif;" onclick="showToast('Connecting to astrologer…')">
+            📞 Start Call — Free 5 min
+          </button>
+        </div>
+      </div>`;
+    CC.appendChild(row);
+    scrollBottom();
+  }, 1200);
+}
+
+function openPdfSheet() { document.getElementById('pdfSheet').classList.add('open'); }
+function closePdfSheet(e) {
+  if(e.target === document.getElementById('pdfSheet')) closePdf();
+}
+function closePdf() { document.getElementById('pdfSheet').classList.remove('open'); }
+
+function handleUserInput() {
+  const inp = document.getElementById('chatInput');
+  const val = inp.value.trim();
+  if(!val) return;
+  inp.value = '';
+  userMessage(val);
+  showThinkingThen(()=>{
+    aiMessage(`That's a great question about Kundali Milan. Based on Arjun and Priya's charts, I can see that their <strong>planetary positions align favourably</strong> in this regard. For a more personalised reading, consider connecting with an astrologer who can review the full Kundali. 🔮`);
+  });
+}
+
+document.getElementById('chatInput').addEventListener('keydown', e=>{ if(e.key==='Enter') handleUserInput(); });
+</script>
+</body>
+</html>
