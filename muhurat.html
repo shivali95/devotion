@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Jyotish Saathi — Jio Omni AI</title>
+<title>Shubh Muhurat — Jio Omni AI</title>
 <style>
 @font-face { font-family:'JioType'; font-weight:400; src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2'); }
 @font-face { font-family:'JioType'; font-weight:500; src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2'); }
@@ -3978,13 +3978,7 @@ let _callTimerInterval = null;
 let _callTimerStart = 0;
 
 function goBackToLanding() {
-  const el = document.getElementById('landingOverlay');
-  if (el) {
-    el.style.display = 'flex';
-    showLandingScreen();
-  } else {
-    window.location.href = 'https://shivali95.github.io/devotion/jyotish-saathi.html';
-  }
+  window.location.href = 'https://shivali95.github.io/devotion/muhurat.html';
 }
 
 function showLandingScreen() {
@@ -4303,8 +4297,15 @@ function _clearCallTimer() {
 function hangUpCall()    { _clearCallTimer(); document.getElementById('callScreen').style.display='none'; }
 function continueInChat(){ _clearCallTimer(); document.getElementById('callScreen').style.display='none'; startWelcome(); }
 
-// ── Init ──
-showLandingScreen();
+// ── Init ── Muhurat prototype: skip landing, go straight to muhurat menu
+(function() {
+  const overlay = document.getElementById('landingOverlay');
+  if (overlay) overlay.style.display = 'none';
+  userName = 'Rohit';
+  isOnboarding = false;
+  onboardingStep = 6;
+  showMuhuratMenu();
+})();
 </script>
 
 
