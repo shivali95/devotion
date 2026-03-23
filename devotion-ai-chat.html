@@ -414,26 +414,36 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 .fwd-card-sub{font-size:9.5px;color:rgba(255,255,255,0.75);margin-top:3px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.6);}
 .fwd-card-tap-hint{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.45);border-radius:var(--shape-pill);padding:3px 7px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.9);z-index:3;text-transform:uppercase;letter-spacing:0.03em;backdrop-filter:blur(4px);}
 /* Forward bottom sheet */
-.fwd-sheet-overlay{position:absolute;inset:0;z-index:250;background:rgba(0,0,0,0.52);display:none;align-items:flex-end;}
+.fwd-sheet-overlay{position:absolute;inset:0;z-index:250;background:rgba(0,0,0,0.72);display:none;align-items:flex-end;}
 .fwd-sheet-overlay.open{display:flex;}
-.fwd-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:88%;overflow-y:auto;}
+.fwd-sheet{background:#000;border-radius:20px 20px 0 0;width:100%;overflow:hidden;}
 .fwd-sheet.slide-in{animation:sheetUp 320ms var(--ease-decelerate);}
 @keyframes sheetUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.fwd-sheet-handle{width:36px;height:4px;background:var(--grey-40);border-radius:2px;margin:12px auto 6px;}
-.fwd-sheet-hero{width:100%;height:196px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;}
-.fwd-sheet-hero-emoji{font-size:68px;position:relative;z-index:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.22));}
-.fwd-sheet-hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,0.68) 100%);}
-.fwd-sheet-hero-name{position:absolute;bottom:14px;left:20px;right:20px;z-index:2;font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.02em;}
-.fwd-sheet-body{padding:16px 18px 28px;}
-.fwd-msg-box{background:var(--surface-ghost);border-radius:var(--shape-medium);padding:14px 15px;margin-bottom:14px;}
-.fwd-msg-label{font-size:10px;font-weight:800;color:var(--text-low);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
-.fwd-msg-text{font-size:14px;font-weight:600;color:var(--text-high);line-height:1.6;white-space:pre-line;}
-.fwd-edit-area{margin-bottom:14px;display:none;}
-.fwd-edit-area.open{display:block;}
+.fwd-sheet-handle{width:36px;height:4px;background:rgba(255,255,255,0.3);border-radius:2px;margin:10px auto 0;position:relative;z-index:20;}
+/* --- VIEW STATE: big full image --- */
+.fwd-preview-card{width:100%;height:420px;position:relative;overflow:hidden;flex-shrink:0;transition:height 0.35s cubic-bezier(0.4,0,0.2,1);}
+.fwd-preview-card-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;z-index:0;}
+.fwd-preview-grad{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,0.93) 100%);z-index:1;}
+.fwd-close-btn{position:absolute;top:14px;right:14px;z-index:10;width:32px;height:32px;border-radius:50%;border:none;background:rgba(0,0,0,0.5);color:#fff;font-size:14px;font-family:'JioType',sans-serif;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(8px);line-height:1;}
+.fwd-preview-text{position:absolute;bottom:70px;left:0;right:0;z-index:5;padding:0 18px;color:#fff;font-size:13.5px;font-weight:600;line-height:1.75;white-space:pre-line;text-shadow:0 1px 10px rgba(0,0,0,0.9);}
+/* Edit button floating over image */
+.fwd-edit-fab{position:absolute;bottom:14px;right:14px;z-index:10;padding:8px 16px;border:none;border-radius:var(--shape-pill);background:rgba(255,255,255,0.18);color:#fff;font-family:'JioType',sans-serif;font-size:12px;font-weight:700;cursor:pointer;backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.25);transition:all 0.15s;display:flex;align-items:center;gap:5px;}
+.fwd-edit-fab:active{background:rgba(255,255,255,0.28);}
+/* --- EDIT STATE --- */
+.fwd-sheet.edit-mode .fwd-preview-card{height:200px;}
+.fwd-sheet.edit-mode .fwd-preview-text{bottom:10px;font-size:12px;}
+.fwd-sheet.edit-mode .fwd-edit-fab{display:none;}
+.fwd-edit-panel{background:var(--surface);padding:16px 18px 32px;display:none;}
+.fwd-sheet.edit-mode .fwd-edit-panel{display:block;}
 .fwd-edit-label{font-size:11px;font-weight:700;color:var(--text-low);margin-bottom:7px;}
-.fwd-edit-input{width:100%;background:var(--surface-ghost);border:2px solid transparent;border-radius:var(--shape-medium);padding:12px 14px;font-family:'JioType',sans-serif;font-size:14px;font-weight:500;color:var(--text-high);line-height:1.5;resize:none;outline:none;min-height:90px;}
+.fwd-edit-input{width:100%;background:var(--surface-ghost);border:2px solid transparent;border-radius:var(--shape-medium);padding:12px 14px;font-family:'JioType',sans-serif;font-size:14px;font-weight:500;color:var(--text-high);line-height:1.6;resize:none;outline:none;box-sizing:border-box;min-height:110px;}
 .fwd-edit-input:focus{border-color:var(--primary-30);}
-.fwd-actions{display:flex;flex-direction:column;gap:10px;}
+.fwd-edit-btns{display:flex;gap:8px;margin-top:10px;margin-bottom:14px;}
+.fwd-apply-btn{flex:1;padding:10px;border:none;border-radius:var(--shape-pill);background:var(--primary-50);color:#fff;font-family:'JioType',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.fwd-cancel-btn{padding:10px 16px;border:1.5px solid var(--stroke-minimal);border-radius:var(--shape-pill);background:var(--surface);font-family:'JioType',sans-serif;font-size:13px;font-weight:600;color:var(--text-high);cursor:pointer;}
+/* View-state action bar */
+.fwd-view-bar{background:var(--surface);padding:12px 18px 28px;display:flex;flex-direction:column;gap:10px;}
+.fwd-sheet.edit-mode .fwd-view-bar{display:none;}
 .fwd-action-sec{display:flex;gap:8px;}
 .fwd-action-btn{flex:1;padding:11px 10px;border:1.5px solid var(--stroke-minimal);border-radius:var(--shape-pill);background:var(--surface);font-family:'JioType',sans-serif;font-size:12px;font-weight:600;color:var(--text-high);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.15s;}
 .fwd-action-btn:active{background:var(--surface-ghost);transform:scale(0.97);}
@@ -510,32 +520,41 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
   <div class="fwd-sheet-overlay" id="fwdSheetOverlay" onclick="closeFwdSheet()">
     <div class="fwd-sheet slide-in" id="fwdSheet" onclick="event.stopPropagation()">
       <div class="fwd-sheet-handle"></div>
-      <div class="fwd-sheet-hero">
-        <div id="fwdHeroBg" style="position:absolute;inset:0;"></div>
-        <span class="fwd-sheet-hero-emoji" id="fwdHeroEmoji"></span>
-        <div class="fwd-sheet-hero-overlay"></div>
-        <div class="fwd-sheet-hero-name" id="fwdHeroName"></div>
+
+      <!-- STATE 1: Full image card view -->
+      <div class="fwd-preview-card" id="fwdPreviewCard">
+        <img class="fwd-preview-card-bg" id="fwdCardImg" src="" alt="" onerror="this.style.display='none'">
+        <div class="fwd-preview-grad"></div>
+        <button class="fwd-close-btn" onclick="closeFwdSheet()">✕</button>
+        <!-- Message text overlaid on image -->
+        <div class="fwd-preview-text" id="fwdPreviewText"></div>
+        <!-- Small edit FAB floating over image -->
+        <button class="fwd-edit-fab" id="fwdEditFab" onclick="enterFwdEditMode()">✏️ Edit</button>
       </div>
-      <div class="fwd-sheet-body">
-        <div class="fwd-msg-box">
-          <div class="fwd-msg-label">Message Preview</div>
-          <div class="fwd-msg-text" id="fwdMsgText"></div>
+
+      <!-- View-state action bar (Share button) -->
+      <div class="fwd-view-bar" id="fwdViewBar">
+        <div class="fwd-action-sec">
+          <button class="fwd-action-btn" onclick="addNameFwd()">👤 Add My Name</button>
         </div>
-        <div class="fwd-edit-area" id="fwdEditArea">
-          <div class="fwd-edit-label">✏️ Message edit karein:</div>
-          <textarea class="fwd-edit-input" id="fwdEditInput" rows="4"></textarea>
-          <button onclick="applyFwdEdit()" style="margin-top:8px;padding:9px 20px;border:none;border-radius:var(--shape-pill);background:var(--primary-50);color:#fff;font-family:'JioType',sans-serif;font-size:13px;font-weight:700;cursor:pointer;">✓ Apply Changes</button>
+        <button class="fwd-wa-btn" onclick="shareFwd()">
+          <svg viewBox="0 0 30 30" width="22" height="22" fill="#fff"><path d="M15 3C8.373 3 3 8.373 3 15c0 2.016.53 3.912 1.463 5.545L3 27l6.637-1.438A11.946 11.946 0 0015 27c6.627 0 12-5.373 12-12S21.627 3 15 3zm.016 2c5.523 0 9.984 4.476 9.984 10 0 5.523-4.461 10-9.984 10a9.944 9.944 0 01-4.977-1.33l-.352-.21-3.651.791.812-3.555-.23-.368A9.944 9.944 0 015.016 15c0-5.524 4.46-10 10-10zm-2.99 5a.93.93 0 00-.674.303c-.23.252-.879.859-.879 2.094 0 1.234.9 2.427 1.025 2.594.125.168 1.749 2.748 4.293 3.748 2.543.999 2.543.666 3.002.624.46-.04 1.484-.607 1.692-1.192.21-.584.21-1.086.147-1.191-.063-.104-.23-.167-.48-.293-.25-.126-1.484-.734-1.714-.817-.23-.083-.398-.126-.565.125-.168.25-.648.817-.795.984-.146.168-.293.188-.544.063-.25-.125-1.057-.39-2.012-1.24-.744-.663-1.244-1.48-1.39-1.73-.147-.25-.015-.386.11-.51.113-.11.25-.292.375-.439.125-.146.167-.25.25-.417.084-.167.042-.313-.02-.439-.063-.125-.565-1.367-.775-1.868-.196-.481-.4-.418-.566-.426a10.1 10.1 0 00-.48-.01z"/></svg>
+          Share on WhatsApp
+        </button>
+      </div>
+
+      <!-- STATE 2: Edit panel (hidden, shown in edit-mode) -->
+      <div class="fwd-edit-panel" id="fwdEditPanel">
+        <div class="fwd-edit-label">✏️ Text edit karein — card pe live dikhega:</div>
+        <textarea class="fwd-edit-input" id="fwdEditInput" rows="5" oninput="previewFwdMsg()"></textarea>
+        <div class="fwd-edit-btns">
+          <button class="fwd-apply-btn" onclick="applyFwdEdit()">✓ Apply</button>
+          <button class="fwd-cancel-btn" onclick="cancelFwdEdit()">← Back</button>
         </div>
-        <div class="fwd-actions">
-          <div class="fwd-action-sec">
-            <button class="fwd-action-btn" onclick="toggleFwdEdit()">✏️ Edit Message</button>
-            <button class="fwd-action-btn" onclick="addNameFwd()">👤 Add My Name</button>
-          </div>
-          <button class="fwd-wa-btn" onclick="shareFwd()">
-            <svg viewBox="0 0 30 30" width="22" height="22" fill="#fff"><path d="M15 3C8.373 3 3 8.373 3 15c0 2.016.53 3.912 1.463 5.545L3 27l6.637-1.438A11.946 11.946 0 0015 27c6.627 0 12-5.373 12-12S21.627 3 15 3zm.016 2c5.523 0 9.984 4.476 9.984 10 0 5.523-4.461 10-9.984 10a9.944 9.944 0 01-4.977-1.33l-.352-.21-3.651.791.812-3.555-.23-.368A9.944 9.944 0 015.016 15c0-5.524 4.46-10 10-10zm-2.99 5a.93.93 0 00-.674.303c-.23.252-.879.859-.879 2.094 0 1.234.9 2.427 1.025 2.594.125.168 1.749 2.748 4.293 3.748 2.543.999 2.543.666 3.002.624.46-.04 1.484-.607 1.692-1.192.21-.584.21-1.086.147-1.191-.063-.104-.23-.167-.48-.293-.25-.126-1.484-.734-1.714-.817-.23-.083-.398-.126-.565.125-.168.25-.648.817-.795.984-.146.168-.293.188-.544.063-.25-.125-1.057-.39-2.012-1.24-.744-.663-1.244-1.48-1.39-1.73-.147-.25-.015-.386.11-.51.113-.11.25-.292.375-.439.125-.146.167-.25.25-.417.084-.167.042-.313-.02-.439-.063-.125-.565-1.367-.775-1.868-.196-.481-.4-.418-.566-.426a10.1 10.1 0 00-.48-.01z"/></svg>
-            Share on WhatsApp
-          </button>
-        </div>
+        <button class="fwd-wa-btn" style="margin-top:10px;" onclick="shareFwd()">
+          <svg viewBox="0 0 30 30" width="22" height="22" fill="#fff"><path d="M15 3C8.373 3 3 8.373 3 15c0 2.016.53 3.912 1.463 5.545L3 27l6.637-1.438A11.946 11.946 0 0015 27c6.627 0 12-5.373 12-12S21.627 3 15 3zm.016 2c5.523 0 9.984 4.476 9.984 10 0 5.523-4.461 10-9.984 10a9.944 9.944 0 01-4.977-1.33l-.352-.21-3.651.791.812-3.555-.23-.368A9.944 9.944 0 015.016 15c0-5.524 4.46-10 10-10zm-2.99 5a.93.93 0 00-.674.303c-.23.252-.879.859-.879 2.094 0 1.234.9 2.427 1.025 2.594.125.168 1.749 2.748 4.293 3.748 2.543.999 2.543.666 3.002.624.46-.04 1.484-.607 1.692-1.192.21-.584.21-1.086.147-1.191-.063-.104-.23-.167-.48-.293-.25-.126-1.484-.734-1.714-.817-.23-.083-.398-.126-.565.125-.168.25-.648.817-.795.984-.146.168-.293.188-.544.063-.25-.125-1.057-.39-2.012-1.24-.744-.663-1.244-1.48-1.39-1.73-.147-.25-.015-.386.11-.51.113-.11.25-.292.375-.439.125-.146.167-.25.25-.417.084-.167.042-.313-.02-.439-.063-.125-.565-1.367-.775-1.868-.196-.481-.4-.418-.566-.426a10.1 10.1 0 00-.48-.01z"/></svg>
+          Share on WhatsApp
+        </button>
       </div>
     </div>
   </div>
@@ -3563,7 +3582,7 @@ const devotionalForwardsHindu = [
   {
     id: 'radha_krishna',
     deity: 'Radha Krishna Ji 🙏',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0f/Radha_Krishna_(Kolkata).JPG',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/d/d4/Radha_Krishna_ISKCON_Tirupati.JPG',
     bg: 'linear-gradient(135deg,#4a148c,#880e4f)',
     cardTitle: 'राधे राधे 🙏',
     message: '🙏 राधे राधे!\n\nश्री कृष्ण आपको और आपके\nपरिवार को खुशियां दें\nहर पल प्रेम और शांति मिले\n\nजय श्री कृष्ण 🌸',
@@ -3593,7 +3612,7 @@ const devotionalForwardsHindu = [
   {
     id: 'suprabhat',
     deity: 'Suprabhat 🌸',
-    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Lotus_flower.JPG',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b9/Sunrise_through_flowers.jpg',
     bg: 'linear-gradient(135deg,#1b5e20,#388e3c)',
     cardTitle: 'सुप्रभात 🌸\nGood Morning',
     message: '"दुआ" मिले बड़ों से..\n"साथ" मिले अपनों से..\n"खुशियाँ" मिले जग से..\n"रहमत" मिले रब से..\n\nयही दुआ है प्रभु से..\nसब खुश रहें 🙏\n\nसुप्रभात — Good Morning!',
@@ -3697,63 +3716,81 @@ function openFwdCard(id) {
   const f = currentFwdData[id];
   if (!f) return;
   window._currentFwdId = id;
+  window._fwdOrigMsg = f.message;
 
-  // Populate sheet
-  const bgEl = document.getElementById('fwdHeroBg');
+  // Set card image — use <img> tag (no background-image CSS bugs)
+  const imgEl = document.getElementById('fwdCardImg');
+  const cardEl = document.getElementById('fwdPreviewCard');
   if (f.imageUrl) {
-    bgEl.style.cssText = `position:absolute;inset:0;background-image:url('${f.imageUrl}');background-size:cover;background-position:center top;`;
+    imgEl.src = f.imageUrl;
+    imgEl.style.display = '';
+    cardEl.style.background = '#111';
   } else {
-    bgEl.style.cssText = `position:absolute;inset:0;background:${f.bg};`;
+    imgEl.src = '';
+    imgEl.style.display = 'none';
+    cardEl.style.background = f.bg;
   }
-  document.getElementById('fwdHeroEmoji').textContent = '';
-  document.getElementById('fwdHeroName').textContent = f.deity;
-  document.getElementById('fwdMsgText').textContent = f.message;
+
+  // Message text overlaid on card
+  document.getElementById('fwdPreviewText').textContent = f.message;
   document.getElementById('fwdEditInput').value = f.message;
-  document.getElementById('fwdEditArea').classList.remove('open');
+
+  // Reset to view state (not edit mode)
+  document.getElementById('fwdSheet').classList.remove('edit-mode');
 
   // Animate sheet in fresh each open
   const sheet = document.getElementById('fwdSheet');
   sheet.classList.remove('slide-in');
-  void sheet.offsetWidth; // force reflow
+  void sheet.offsetWidth;
   sheet.classList.add('slide-in');
 
   document.getElementById('fwdSheetOverlay').classList.add('open');
+}
+
+function enterFwdEditMode() {
+  document.getElementById('fwdSheet').classList.add('edit-mode');
+  setTimeout(() => {
+    document.getElementById('fwdEditInput').focus();
+  }, 300);
 }
 
 function closeFwdSheet() {
   document.getElementById('fwdSheetOverlay').classList.remove('open');
 }
 
-function toggleFwdEdit() {
-  const area = document.getElementById('fwdEditArea');
-  const isOpen = area.classList.toggle('open');
-  if (isOpen) {
-    document.getElementById('fwdEditInput').focus();
-    // Scroll sheet to show edit area
-    document.getElementById('fwdSheet').scrollTo({ top: 400, behavior: 'smooth' });
-  }
+function previewFwdMsg() {
+  // Live update text on the card as user types in edit mode
+  document.getElementById('fwdPreviewText').textContent = document.getElementById('fwdEditInput').value;
 }
 
 function applyFwdEdit() {
-  const val = document.getElementById('fwdEditInput').value;
-  document.getElementById('fwdMsgText').textContent = val;
-  // Update the data store too
+  const msgVal = document.getElementById('fwdEditInput').value;
+  document.getElementById('fwdPreviewText').textContent = msgVal;
   if (window._currentFwdId && currentFwdData[window._currentFwdId]) {
-    currentFwdData[window._currentFwdId].message = val;
+    currentFwdData[window._currentFwdId].message = msgVal;
   }
-  document.getElementById('fwdEditArea').classList.remove('open');
-  showFwdToast('✏️ Message update ho gaya!');
+  window._fwdOrigMsg = msgVal;
+  // Go back to view state
+  document.getElementById('fwdSheet').classList.remove('edit-mode');
+  showFwdToast('✏️ Changes save ho gaye!');
+}
+
+function cancelFwdEdit() {
+  // Revert text, go back to view state
+  document.getElementById('fwdPreviewText').textContent = window._fwdOrigMsg || '';
+  document.getElementById('fwdEditInput').value = window._fwdOrigMsg || '';
+  document.getElementById('fwdSheet').classList.remove('edit-mode');
 }
 
 function addNameFwd() {
-  const msgEl = document.getElementById('fwdMsgText');
+  const previewEl = document.getElementById('fwdPreviewText');
   const editEl = document.getElementById('fwdEditInput');
-  const currentMsg = msgEl.textContent;
+  const currentMsg = previewEl.textContent;
   // Don't add name if already added
   if (currentMsg.includes('— From ')) { showFwdToast('👤 Naam pehle se add hai!'); return; }
   const name = (userFaith === 'Muslim') ? 'Aapka Parivaar' : 'Aapka Parivaar 🙏';
   const updated = currentMsg + '\n\n— From ' + name;
-  msgEl.textContent = updated;
+  previewEl.textContent = updated;
   editEl.value = updated;
   if (window._currentFwdId && currentFwdData[window._currentFwdId]) {
     currentFwdData[window._currentFwdId].message = updated;
