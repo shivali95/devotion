@@ -1047,8 +1047,8 @@ function showAllOptions() {
       <button class="option-card" style="grid-column:1/-1;flex-direction:row;align-items:center;gap:14px;background:var(--secondary-20);border-color:var(--secondary-30);" onclick="triggerChip('devotional forwards')">
         <div class="option-icon" style="background:linear-gradient(135deg,#e65100,#f7ab20);flex-shrink:0">${IC.fire}</div>
         <div style="flex:1">
-          <div class="option-label" style="color:var(--secondary-60)">Aaj ke Devotional Forwards 📤</div>
-          <div class="option-sub">Parivaar ko WhatsApp par bhejein — ek tap mein!</div>
+          <div class="option-label" style="color:var(--secondary-60)">✨ Aaj ki Story</div>
+          <div class="option-sub">Aaj ki bhakti story — padhein, share karein</div>
         </div>
       </button>
     </div>
@@ -3652,7 +3652,7 @@ function showDevoForwards() {
     'Aaj Shanivar hai — Hanuman ji ki seva ka khaas din'
   ];
   const today = new Date().getDay();
-  const dayCtx = isMuslim ? 'Aaj ke Islamic devotional forwards apne parivaar tak pahunchayein' : dayContexts[today];
+  const dayCtx = isMuslim ? 'Aaj ki Islamic story — padhein aur apnon ke saath share karein' : dayContexts[today];
   const dayLabel = isMuslim ? 'Aaj ka Din' : dayNames[today];
   const dateStr = new Date().toLocaleDateString('hi-IN', {day:'numeric', month:'long'});
 
@@ -3677,7 +3677,7 @@ function showDevoForwards() {
       <div class="fwd-day-badge">📅 ${dayLabel} — ${dateStr}</div>
       <div class="ai-text" style="margin-bottom:10px">
         <p><strong>${dayCtx}</strong></p>
-        <p style="color:var(--text-low);font-size:13px;margin-top:4px">Yeh devotional forwards apne parivaar aur dosto ko bhejein — WhatsApp par ek tap mein! 🙏</p>
+        <p style="color:var(--text-low);font-size:13px;margin-top:4px">Aaj ki story padhein — aur ek tap mein apne parivaar aur dosto tak pahunchayein 🙏</p>
       </div>
       <div class="fwd-scroll-row">${cardsHTML}</div>
     </div>
@@ -3770,7 +3770,7 @@ function shareFwd() {
       const faith = userFaith || 'Hindu';
       const msg = aiMessage(`<p>🎉 Forward share ho gaya! Aapke parivaar tak bhakti ka sandesh pahunch gaya.</p><p style="margin-top:6px;font-size:13px;color:var(--text-low)">Kal ke forwards ke liye kal phir yahan aaiyega — roze naye devotional messages tayyar hote hain!</p>`, false, false);
       addChipsLater(msg.querySelector('.ai-content'), `
-        <button class="chip" onclick="triggerChip('devotional forwards')">📤 Aur Forwards Dekhein</button>
+        <button class="chip" onclick="triggerChip('devotional forwards')">✨ Aur Stories Dekhein</button>
         <button class="chip" onclick="showAllOptions()">✨ Sabhi Features</button>
       `);
       scrollBottom();
