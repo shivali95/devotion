@@ -407,12 +407,12 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 .fwd-scroll-row::-webkit-scrollbar{display:none;}
 .fwd-card{flex-shrink:0;width:140px;height:188px;border-radius:var(--shape-large);overflow:hidden;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;transition:transform 0.15s var(--ease-standard);border:1px solid var(--stroke-subtle);}
 .fwd-card:active{transform:scale(0.95);}
-.fwd-card-emoji{font-size:54px;position:relative;z-index:1;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.25));}
-.fwd-card-overlay{position:absolute;inset:0;background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,0.75) 100%);}
+.fwd-card-photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;z-index:0;}
+.fwd-card-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.08) 0%,transparent 30%,rgba(0,0,0,0.82) 100%);z-index:1;}
 .fwd-card-text{position:absolute;bottom:0;left:0;right:0;padding:10px 11px;z-index:2;}
-.fwd-card-msg{font-size:10.5px;font-weight:700;color:#fff;line-height:1.4;}
-.fwd-card-sub{font-size:9.5px;color:rgba(255,255,255,0.62);margin-top:3px;font-weight:500;}
-.fwd-card-tap-hint{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.38);border-radius:var(--shape-pill);padding:3px 7px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.85);z-index:3;text-transform:uppercase;letter-spacing:0.03em;}
+.fwd-card-title{font-size:13px;font-weight:900;color:#fff;line-height:1.3;letter-spacing:-0.01em;text-shadow:0 1px 6px rgba(0,0,0,0.7);}
+.fwd-card-sub{font-size:9.5px;color:rgba(255,255,255,0.75);margin-top:3px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,0.6);}
+.fwd-card-tap-hint{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.45);border-radius:var(--shape-pill);padding:3px 7px;font-size:9px;font-weight:700;color:rgba(255,255,255,0.9);z-index:3;text-transform:uppercase;letter-spacing:0.03em;backdrop-filter:blur(4px);}
 /* Forward bottom sheet */
 .fwd-sheet-overlay{position:absolute;inset:0;z-index:250;background:rgba(0,0,0,0.52);display:none;align-items:flex-end;}
 .fwd-sheet-overlay.open{display:flex;}
@@ -3561,28 +3561,44 @@ function closeSacredMode() {
 
 const devotionalForwardsHindu = [
   {
-    id: 'hanuman', deity: 'Hanuman Ji 🚩', emoji: '🚩',
-    bg: 'linear-gradient(135deg,#b71c1c,#e64a19)',
-    message: 'जय श्री राम 🙏\n\nमंगलवार को हनुमान जी\nआपकी रक्षा करें\nआपके हर कष्ट दूर हों\n\n— परिवार को भेजें',
-    preview: 'जय श्री राम 🙏 हनुमान जी का आशीर्वाद', sub: 'Hanuman Ji Blessing'
+    id: 'radha_krishna',
+    deity: 'Radha Krishna Ji 🙏',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/0/0f/Radha_Krishna_(Kolkata).JPG',
+    bg: 'linear-gradient(135deg,#4a148c,#880e4f)',
+    cardTitle: 'राधे राधे 🙏',
+    message: '🙏 राधे राधे!\n\nश्री कृष्ण आपको और आपके\nपरिवार को खुशियां दें\nहर पल प्रेम और शांति मिले\n\nजय श्री कृष्ण 🌸',
+    preview: 'राधे राधे 🙏 — Krishna Ji ka Ashirwad',
+    sub: 'Radha Krishna Blessing'
   },
   {
-    id: 'morning', deity: '🌅 Shuprabhaat', emoji: '🌅',
-    bg: 'linear-gradient(135deg,#e65100,#f9a825)',
-    message: '🌅 सुप्रभात!\n\nहर सुबह एक नई शुरुआत है\nआज का दिन मंगलमय हो,\nसुख-शांति से भरा हो!\n\nजय माता दी 🙏',
-    preview: '🌅 सुप्रभात — आज का दिन मंगलमय हो!', sub: 'Good Morning Blessing'
+    id: 'holi',
+    deity: 'Holi ki Shubhkamnayein 🎨',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Holi.JPG',
+    bg: 'linear-gradient(135deg,#e53935,#fb8c00)',
+    cardTitle: 'होली की\nशुभकामनाएं! 🎨',
+    message: '🎨 होली की हार्दिक शुभकामनाएं!\n\nफीके ना पड़े आपकी जिंदगी के रंग\nआप मुस्कुराते रहें अपनों के संग\nआप और आपके परिवार को\nहोली की ढेर सारी बधाई! 🌈',
+    preview: '🎨 होली की हार्दिक शुभकामनाएं!',
+    sub: 'Holi Festival Greeting'
   },
   {
-    id: 'ganesh', deity: 'Ganesh Ji 🐘', emoji: '🐘',
-    bg: 'linear-gradient(135deg,#4a148c,#7b1fa2)',
-    message: '🐘 श्री गणेशाय नमः!\n\nगणपति बप्पा आपकी हर\nमनोकामना पूरी करें\nनई शुरुआत में सफलता\nमिले सदा 🙏',
-    preview: '🐘 गणपति बप्पा का आशीर्वाद', sub: 'Ganesh Ji Blessing'
+    id: 'navratri',
+    deity: 'Jai Mata Di 🌸',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c6/Durga_Puja_close_up.JPG',
+    bg: 'linear-gradient(135deg,#880e4f,#e65100)',
+    cardTitle: 'जय माता दी 🌸',
+    message: '🌸 जय माता दी!\n\nनवरात्रि की हार्दिक शुभकामनाएं\nमाँ दुर्गा आपके घर में\nसुख, समृद्धि और शांति लाएं\n\nजय माता दी 🙏',
+    preview: '🌸 जय माता दी — Navratri Shubhkamnayein',
+    sub: 'Navratri Blessing'
   },
   {
-    id: 'shiv', deity: 'Shiv Ji 🔱', emoji: '🔱',
-    bg: 'linear-gradient(135deg,#1a237e,#283593)',
-    message: '🔱 ॐ नमः शिवाय!\n\nशंकर जी आपके सभी\nकष्ट हरें, शांति और\nसमृद्धि दें हर दिन\n\nहर हर महादेव 🙏',
-    preview: '🔱 ॐ नमः शिवाय — शांति मिले', sub: 'Shiv Ji Blessing'
+    id: 'suprabhat',
+    deity: 'Suprabhat 🌸',
+    imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Lotus_flower.JPG',
+    bg: 'linear-gradient(135deg,#1b5e20,#388e3c)',
+    cardTitle: 'सुप्रभात 🌸\nGood Morning',
+    message: '"दुआ" मिले बड़ों से..\n"साथ" मिले अपनों से..\n"खुशियाँ" मिले जग से..\n"रहमत" मिले रब से..\n\nयही दुआ है प्रभु से..\nसब खुश रहें 🙏\n\nसुप्रभात — Good Morning!',
+    preview: '🌸 सुप्रभात — Good Morning Blessing',
+    sub: 'Good Morning Blessing'
   }
 ];
 
@@ -3645,13 +3661,12 @@ function showDevoForwards() {
   msg.style.animation = 'msgIn 350ms var(--ease-decelerate)';
 
   const cardsHTML = forwards.map(f => `
-    <div class="fwd-card" onclick="openFwdCard('${f.id}')">
-      <div style="position:absolute;inset:0;background:${f.bg};"></div>
-      <span class="fwd-card-emoji">${f.emoji}</span>
+    <div class="fwd-card" onclick="openFwdCard('${f.id}')" style="background:${f.bg}">
+      ${f.imageUrl ? `<img class="fwd-card-photo" src="${f.imageUrl}" alt="" loading="lazy" onerror="this.style.opacity='0'">` : ''}
       <div class="fwd-card-overlay"></div>
       <div class="fwd-card-tap-hint">Tap</div>
       <div class="fwd-card-text">
-        <div class="fwd-card-msg">${f.preview}</div>
+        <div class="fwd-card-title">${f.cardTitle || f.deity}</div>
         <div class="fwd-card-sub">${f.sub}</div>
       </div>
     </div>
@@ -3684,8 +3699,13 @@ function openFwdCard(id) {
   window._currentFwdId = id;
 
   // Populate sheet
-  document.getElementById('fwdHeroBg').style.background = f.bg;
-  document.getElementById('fwdHeroEmoji').textContent = f.emoji;
+  const bgEl = document.getElementById('fwdHeroBg');
+  if (f.imageUrl) {
+    bgEl.style.cssText = `position:absolute;inset:0;background-image:url('${f.imageUrl}');background-size:cover;background-position:center top;`;
+  } else {
+    bgEl.style.cssText = `position:absolute;inset:0;background:${f.bg};`;
+  }
+  document.getElementById('fwdHeroEmoji').textContent = '';
   document.getElementById('fwdHeroName').textContent = f.deity;
   document.getElementById('fwdMsgText').textContent = f.message;
   document.getElementById('fwdEditInput').value = f.message;
