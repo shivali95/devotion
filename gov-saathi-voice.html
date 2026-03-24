@@ -378,30 +378,67 @@ const SC = {
 };
 
 // ── Voice loading ──
-function loadVoices() {
+function getBestVoice() {
   const voices = synth.getVoices();
-  hindiVoice =
-    voices.find(v => v.lang === 'hi-IN' && /male/i.test(v.name)) ||
-    voices.find(v => v.lang === 'hi-IN') ||
-    voices.find(v => v.lang.startsWith('hi')) ||
-    null;
+  return voices.find(v => v.lang === 'hi-IN' && /male/i.test(v.name))
+    || voices.find(v => v.lang === 'hi-IN')
+    || voices.find(v => v.lang.startsWith('hi'))
+    || voices.find(v => v.default)
+    || voices[0]
+    || null;
 }
+function loadVoices() { hindiVoice = getBestVoice(); }
 if (synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
 loadVoices();
 
+// iOS fix: SpeechSynthesis must be unlocked synchronously inside a user gesture.
+// Call this in every click handler before any setTimeout.
+let _audioUnlocked = false;
+function unlockAudio() {
+  if (_audioUnlocked) return;
+  _audioUnlocked = true;
+  try {
+    const u = new SpeechSynthesisUtterance('');
+    u.volume = 0; u.rate = 10;
+    synth.speak(u);
+    synth.cancel();
+  } catch(e) {}
+}
+
+// Chrome bug: speech can get "stuck" and onend never fires.
+// Periodically resume to unstick it.
+let _resumeInterval = null;
+function startResumeGuard() {
+  stopResumeGuard();
+  _resumeInterval = setInterval(() => { if (synth.speaking && synth.paused) synth.resume(); }, 4000);
+}
+function stopResumeGuard() {
+  if (_resumeInterval) { clearInterval(_resumeInterval); _resumeInterval = null; }
+}
+
 function speak(text, onDone) {
   synth.cancel();
+  stopResumeGuard();
   if (!text) { onDone && onDone(); return; }
+  // Re-fetch voice each time — voices may load after page start
+  const voice = getBestVoice();
   const utt = new SpeechSynthesisUtterance(text);
-  if (hindiVoice) utt.voice = hindiVoice;
-  utt.lang  = 'hi-IN';
-  utt.rate  = 0.90;
-  utt.pitch = 0.93;
+  if (voice) { utt.voice = voice; utt.lang = voice.lang; }
+  else { utt.lang = 'hi-IN'; }
+  utt.rate   = 0.88;
+  utt.pitch  = 0.92;
   utt.volume = 1.0;
   isSpeaking = true;
   setMicState('speaking');
-  utt.onend = () => { isSpeaking = false; setMicState('idle'); onDone && onDone(); };
-  utt.onerror = () => { isSpeaking = false; setMicState('idle'); onDone && onDone(); };
+  startResumeGuard();
+  const finish = () => {
+    stopResumeGuard();
+    isSpeaking = false;
+    setMicState('idle');
+    onDone && onDone();
+  };
+  utt.onend   = finish;
+  utt.onerror = finish;
   synth.speak(utt);
 }
 
@@ -555,6 +592,7 @@ function uploadDV(key) {
 }
 
 function runVerify() {
+  unlockAudio(); // user gesture
   addUser('Verify karo');
   const vb = document.getElementById('verifyBtn');
   if (vb) { vb.disabled = true; vb.style.opacity = '.5'; }
@@ -743,7 +781,7 @@ function processUserTurn(idx, raw) {
 }
 
 function userSaysYesDocs() {
-  // Called from scheme card CTA button
+  unlockAudio(); // user gesture — unlock before setTimeout chain
   if (userTurnIdx <= 3) {
     addUser(DEFAULT_SAYS[3]);
     userTurnIdx = 4;
@@ -765,9 +803,10 @@ function userSaysYesDocs_inner() {
 
 // ── Mic tap handler ──
 function handleMicTap() {
+  unlockAudio(); // keep audio context alive across taps
   if (isSpeaking) {
     // Tap while app is speaking → skip / interrupt
-    synth.cancel(); isSpeaking = false; setMicState('idle');
+    synth.cancel(); stopResumeGuard(); isSpeaking = false; setMicState('idle');
     return;
   }
   if (isListening) { stopListening(null); return; }
@@ -778,6 +817,8 @@ function handleMicTap() {
 
 // ── Entry / Exit ──
 function startVoiceConv() {
+  unlockAudio(); // MUST be synchronous — iOS blocks audio in setTimeout
+  loadVoices();  // refresh voice list at the moment of gesture
   const land = document.getElementById('voiceLanding');
   land.classList.add('exiting');
   setTimeout(() => {
@@ -788,7 +829,6 @@ function startVoiceConv() {
     conversationActive = true;
     userTurnIdx = 0;
     setupReco();
-    // Greet immediately
     setTimeout(() => {
       const gb = addAI(SC.greet, true);
       speak(SC.greet, () => {
@@ -796,8 +836,8 @@ function startVoiceConv() {
         gb.querySelector('.wave-inline')?.remove();
         setMicState('idle');
       });
-    }, 450);
-  }, 380);
+    }, 420);
+  }, 360);
 }
 
 function goBack() {
