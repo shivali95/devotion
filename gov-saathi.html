@@ -155,6 +155,14 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 .gs-cta-row{padding:16px 16px 8px;}
 .gs-cta-btn{width:100%;background:var(--gov-blue);color:#fff;border:none;border-radius:var(--shape-pill);padding:15px;font-size:15px;font-weight:700;cursor:pointer;font-family:'JioType',sans-serif;transition:opacity var(--dur-quick);}
 .gs-cta-btn:active{opacity:0.85;}
+/* Service grid */
+.gs-service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 16px 8px;}
+.gs-svc-card{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--surface);border:1.5px solid var(--stroke-minimal);border-radius:12px;padding:12px 6px 10px;cursor:pointer;font-family:'JioType',sans-serif;text-align:center;transition:border-color var(--dur-quick);}
+.gs-svc-card:active{border-color:var(--gov-blue);background:var(--gov-blue-bg);}
+.gs-svc-icon{font-size:22px;}
+.gs-svc-name{font-size:11px;font-weight:700;color:var(--text-high);line-height:1.3;}
+.gs-svc-dept{font-size:10px;color:var(--text-low);font-weight:400;}
+
 .gs-profile-strip{margin:4px 16px 24px;background:var(--surface-minimal);border-radius:10px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
 .gs-profile-strip span{font-size:12px;color:var(--text-low);line-height:1.4;}
 .gs-profile-strip button{font-family:'JioType',sans-serif;font-size:12px;font-weight:700;color:var(--gov-blue);background:none;border:none;cursor:pointer;white-space:nowrap;}
@@ -250,6 +258,42 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
 .mc-eyebrow{font-size:10px;font-weight:800;color:var(--gov-green);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;}
 .mc-text{font-size:13px;color:var(--text-high);line-height:1.55;}
 
+/* DOCUMENT UPLOAD WIDGET */
+.doc-upload-card{border-radius:14px;border:1px solid var(--stroke-minimal);background:var(--surface);animation:cardIn var(--spring);width:100%;}
+.duc-header{background:var(--gov-blue);color:#fff;padding:11px 16px;font-size:13px;font-weight:700;border-radius:14px 14px 0 0;}
+.duc-row{display:flex;align-items:center;gap:12px;padding:11px 16px;border-bottom:1px solid var(--stroke-subtle);}
+.duc-row:last-child{border-bottom:none;}
+.duc-icon{font-size:18px;flex-shrink:0;}
+.duc-body{flex:1;}
+.duc-doc-name{font-size:13px;font-weight:700;color:var(--text-high);}
+.duc-status{font-size:11px;color:var(--text-low);margin-top:2px;}
+.duc-status.uploaded{color:var(--gov-green);font-weight:600;}
+.duc-upload-btn{flex-shrink:0;background:var(--gov-blue-bg);color:var(--gov-blue);border:1.5px solid var(--gov-blue);border-radius:var(--shape-pill);padding:5px 12px;font-size:12px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;}
+.duc-upload-btn.done{background:var(--gov-green-bg);color:var(--gov-green);border-color:var(--gov-green-20);cursor:default;}
+.duc-verify-row{padding:12px 16px;border-top:1px solid var(--stroke-subtle);}
+.duc-verify-btn{width:100%;background:var(--gov-blue);color:#fff;border:none;border-radius:var(--shape-pill);padding:11px;font-size:14px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;}
+.duc-verify-btn:disabled{opacity:0.45;cursor:default;}
+
+/* PORTAL REDIRECT CARD */
+.portal-card{border-radius:14px;border:1px solid var(--stroke-minimal);background:var(--surface);animation:cardIn var(--spring);width:100%;}
+.pc-header{padding:14px 16px 12px;border-bottom:1px solid var(--stroke-subtle);}
+.pc-eyebrow{font-size:10px;font-weight:700;color:var(--gov-blue);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;}
+.pc-title{font-size:15px;font-weight:800;color:var(--text-high);}
+.pc-url{font-size:11px;color:var(--text-low);margin-top:3px;font-family:monospace;}
+.pc-steps{padding:12px 16px;}
+.pc-step{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid var(--stroke-subtle);}
+.pc-step:last-child{border-bottom:none;}
+.pc-step-num{width:22px;height:22px;border-radius:50%;background:var(--gov-blue);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.pc-step-text{font-size:13px;color:var(--text-high);line-height:1.45;}
+.pc-step-text strong{font-weight:700;}
+.pc-data{margin:0 16px 12px;background:var(--gov-blue-bg);border-radius:10px;padding:10px 12px;}
+.pc-data-label{font-size:10px;font-weight:700;color:var(--gov-blue);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;}
+.pc-data-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;border-bottom:1px solid rgba(0,53,128,0.08);}
+.pc-data-row:last-child{border-bottom:none;}
+.pc-data-key{color:var(--text-low);}
+.pc-data-val{font-weight:700;color:var(--text-high);}
+.pc-open-btn{display:block;margin:0 16px 16px;background:var(--gov-blue);color:#fff;border:none;border-radius:var(--shape-pill);padding:13px;font-size:14px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;text-align:center;width:calc(100% - 32px);}
+
 /* ANIMATIONS */
 @keyframes msgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes cardIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -340,16 +384,82 @@ body{font-family:'JioType',-apple-system,BlinkMacSystemFont,sans-serif;backgroun
           <span class="gs-w-icon">📋</span>
           <span class="gs-w-label">Check my documents</span>
         </button>
-        <button class="gs-widget" onclick="enterChat('form')">
-          <span class="gs-w-icon">✍️</span>
-          <span class="gs-w-label">Apply for a service</span>
-        </button>
         <button class="gs-widget gs-w-disabled">
           <span class="gs-w-icon">📍</span>
           <span class="gs-w-label">Track my application</span>
           <span class="gs-w-badge">Soon</span>
         </button>
+        <button class="gs-widget" onclick="enterChat(null)">
+          <span class="gs-w-icon">💬</span>
+          <span class="gs-w-label">Ask anything</span>
+        </button>
       </div>
+
+      <!-- Apply for a Service — with real service names -->
+      <div class="gs-section-label">Apply for a Service</div>
+      <div class="gs-service-grid">
+        <button class="gs-svc-card" onclick="enterChat('service:aadhaar')">
+          <span class="gs-svc-icon">🪪</span>
+          <span class="gs-svc-name">Aadhaar Update</span>
+          <span class="gs-svc-dept">UIDAI</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:passport')">
+          <span class="gs-svc-icon">🛂</span>
+          <span class="gs-svc-name">Passport</span>
+          <span class="gs-svc-dept">MEA</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:pan')">
+          <span class="gs-svc-icon">💳</span>
+          <span class="gs-svc-name">PAN Card</span>
+          <span class="gs-svc-dept">Income Tax</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:driving')">
+          <span class="gs-svc-icon">🚗</span>
+          <span class="gs-svc-name">Driving License</span>
+          <span class="gs-svc-dept">MoRTH</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:ration')">
+          <span class="gs-svc-icon">🛒</span>
+          <span class="gs-svc-name">Ration Card</span>
+          <span class="gs-svc-dept">State Govt</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:birth')">
+          <span class="gs-svc-icon">👶</span>
+          <span class="gs-svc-name">Birth Certificate</span>
+          <span class="gs-svc-dept">Municipal Corp</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:income')">
+          <span class="gs-svc-icon">📄</span>
+          <span class="gs-svc-name">Income Certificate</span>
+          <span class="gs-svc-dept">Tehsil / SDM</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:voter')">
+          <span class="gs-svc-icon">🗳️</span>
+          <span class="gs-svc-name">Voter ID</span>
+          <span class="gs-svc-dept">Election Comm.</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:caste')">
+          <span class="gs-svc-icon">📜</span>
+          <span class="gs-svc-name">Caste Certificate</span>
+          <span class="gs-svc-dept">Tehsil / SDM</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:digilocker')">
+          <span class="gs-svc-icon">📱</span>
+          <span class="gs-svc-name">DigiLocker</span>
+          <span class="gs-svc-dept">MeitY</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:marriage')">
+          <span class="gs-svc-icon">💍</span>
+          <span class="gs-svc-name">Marriage Cert.</span>
+          <span class="gs-svc-dept">Municipal Corp</span>
+        </button>
+        <button class="gs-svc-card" onclick="enterChat('service:eshram')">
+          <span class="gs-svc-icon">👷</span>
+          <span class="gs-svc-name">e-Shram Card</span>
+          <span class="gs-svc-dept">Labour Ministry</span>
+        </button>
+      </div>
+
       <div class="gs-cta-row">
         <button class="gs-cta-btn" onclick="enterChat(null)">Ask Sarkar Saathi anything</button>
       </div>
@@ -553,6 +663,33 @@ const AGE_MAP = {
   'Under 18':15, '18–25':22, '26–35':30, '36–45':40, '46–60':52, 'Above 60':65
 };
 
+// ── Portal URLs per scheme ──
+const SCHEME_PORTALS = {
+  pmkisan:    { url:'pmkisan.gov.in', name:'PM Kisan Portal', steps:['Login with Aadhaar / Mobile OTP','Enter land & bank details','Upload land record and Aadhaar copy','Submit — installment credited within 3 months'] },
+  pmay:       { url:'pmaymis.gov.in', name:'PMAY MIS Portal', steps:['Login or register with Aadhaar','Fill income and family details','Attach income certificate + Aadhaar','Submit — bank will contact for loan linkage'] },
+  ayushman:   { url:'beneficiary.nha.gov.in', name:'Ayushman Bharat Portal', steps:['Search your name using Aadhaar / Ration Card','Verify OTP on registered mobile','Download Ayushman Card (e-card)','Show at any empanelled hospital for cashless treatment'] },
+  pmegp:      { url:'kviconline.gov.in/pmegpeportal', name:'PMEGP e-Portal', steps:['Register as new applicant with Aadhaar','Fill business project details','Upload DPR (Detailed Project Report)','Submit — bank will call for interview'] },
+  ujjwala:    { url:'pmuy.gov.in', name:'PM Ujjwala Portal', steps:['Visit nearest LPG distributor or apply online','Submit Aadhaar + Ration Card + bank details','Application verified by distributor','LPG connection + cylinder delivered at home'] },
+  scholarship:{ url:'scholarships.gov.in', name:'National Scholarship Portal', steps:['Register with Aadhaar and mobile OTP','Fill academic and family income details','Upload marksheet + income certificate','Submit before state deadline — disbursement via DBT'] },
+  sukanya:    { url:'indiapost.gov.in', name:'India Post / Bank Branch', steps:['Visit nearest Post Office or bank branch','Fill SSY account opening form','Attach girl child birth certificate + guardian Aadhaar','Deposit minimum ₹250 to activate account'] },
+};
+
+// ── Service portal guide data ──
+const SERVICE_PORTALS = {
+  aadhaar:    { name:'Aadhaar Update', dept:'UIDAI', url:'myaadhaar.uidai.gov.in', icon:'🪪', docs:['Current Aadhaar','Proof of new address/name'], steps:['Login at myAadhaar portal with OTP','Select update (Name / Address / DOB / Mobile)','Upload supporting document','Pay ₹50 fee — update takes 5–7 working days'] },
+  passport:   { name:'Passport', dept:'MEA', url:'passportindia.gov.in', icon:'🛂', docs:['Aadhaar','Birth certificate','Address proof'], steps:['Register on Passport Seva portal','Fill application form online','Book appointment at nearest PSK','Visit PSK with original documents — passport dispatched in 3–7 days (Tatkal: 1–3 days)'] },
+  pan:        { name:'PAN Card', dept:'Income Tax', url:'onlineservices.nsdl.com', icon:'💳', docs:['Aadhaar (for e-KYC)','Photo'], steps:['Go to NSDL or UTIITSL portal','Fill Form 49A online','Complete e-KYC via Aadhaar OTP','Pay ₹107 — e-PAN delivered to email in 48 hours'] },
+  driving:    { name:'Driving License', dept:'Parivahan', url:'parivahan.gov.in', icon:'🚗', docs:['Aadhaar','Learner license (if new)','Medical certificate (for transport)'], steps:['Visit Parivahan Sewa portal','Fill application + upload documents','Pay fee and book slot at RTO','Appear for driving test — DL dispatched in 7 days'] },
+  ration:     { name:'Ration Card', dept:'State Government', url:'nfsa.gov.in', icon:'🛒', docs:['Aadhaar (all family members)','Address proof','Income proof'], steps:['Visit state ration card portal or nearest CSC','Fill application with family details','Attach Aadhaar + income document','Verification by inspector — card issued in 30 days'] },
+  birth:      { name:'Birth Certificate', dept:'Municipal Corporation', url:'crsorgi.gov.in', icon:'👶', docs:['Hospital discharge slip','Parents\' Aadhaar','Marriage certificate'], steps:['Apply at municipal office or online CRS portal','Submit hospital birth slip + parents\' Aadhaar','Pay nominal fee','Certificate issued in 7 working days'] },
+  income:     { name:'Income Certificate', dept:'Tehsil / SDM', url:'edistrict.gov.in (state-specific)', icon:'📄', docs:['Aadhaar','Salary slips or self-declaration','Ration card'], steps:['Login to your state e-District portal','Fill income certificate application','Upload Aadhaar + income proof','Certificate issued in 3–7 working days'] },
+  voter:      { name:'Voter ID (EPIC)', dept:'Election Commission', url:'voters.eci.gov.in', icon:'🗳️', docs:['Aadhaar','Address proof','Date of birth proof'], steps:['Visit Voter Registration portal (voters.eci.gov.in)','Fill Form 6 for new registration','Upload photo + address proof','Verification by BLO — card dispatched in 21 days'] },
+  caste:      { name:'Caste Certificate', dept:'Tehsil / SDM', url:'edistrict.gov.in (state-specific)', icon:'📜', docs:['Aadhaar','Parent caste certificate or affidavit','Ration card'], steps:['Login to state e-District portal','Fill caste certificate application','Upload supporting documents','Verification done — certificate in 5–15 working days'] },
+  digilocker: { name:'DigiLocker', dept:'MeitY', url:'digilocker.gov.in', icon:'📱', docs:['Aadhaar','Mobile linked to Aadhaar'], steps:['Download DigiLocker app or visit website','Register with Aadhaar + OTP','Link your documents (Aadhaar, DL, PAN, Marksheet etc.)','Share digitally accepted documents anywhere in India'] },
+  marriage:   { name:'Marriage Certificate', dept:'Municipal Corporation', url:'crsorgi.gov.in', icon:'💍', docs:['Both Aadhaar cards','Marriage invitation / photos','Witness Aadhaar'], steps:['Apply at municipal / tehsil office or CRS portal','Submit joint application with witnesses','Inspector may visit for verification','Certificate issued in 10–30 days depending on state'] },
+  eshram:     { name:'e-Shram Card', dept:'Labour Ministry', url:'eshram.gov.in', icon:'👷', docs:['Aadhaar','Bank account linked to Aadhaar'], steps:['Visit eshram.gov.in or nearest CSC','Register with Aadhaar + OTP + bank details','UAN (Universal Account Number) generated instantly','Download e-Shram card — accident insurance of ₹2L included'] },
+};
+
 // ── Icons ──
 const IC = {
   like:`<svg viewBox="0 0 24 24"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>`,
@@ -725,6 +862,7 @@ function enterChat(intent) {
     if (intent === 'eligibility') startEligibilityFlow();
     else if (intent === 'document') startDocFlowDirect();
     else if (intent === 'form') startFormFlowDirect();
+    else if (intent && intent.startsWith('service:')) showServiceGuide(intent.split(':')[1]);
     else showWelcomeMenu();
   }, 300);
 }
@@ -1090,13 +1228,70 @@ function startDocFlowDirect() {
 function startDocFlow(schemeId) {
   currentFlow = 'document';
   selectedScheme = SCHEMES.find(s => s.id === schemeId) || eligibilityResults[0] || SCHEMES[0];
+  docUploadState = {};  // reset upload state
   setTimeout(() => {
     aiMessage(
-      `<p>I'll verify your documents for <strong>${selectedScheme.name}</strong>. Scanning now...</p>`,
+      `<p>To check your documents for <strong>${selectedScheme.name}</strong>, I need you to upload or scan each required document.</p>
+       <p>Once uploaded, I'll verify them instantly and flag any issues before you apply.</p>`,
       false, true
     );
-    showThinkingThen(showDocValidationResults, 2000);
+    setTimeout(() => appendWidget(buildDocUploadCard(selectedScheme)), 500);
   }, 300);
+}
+
+// Upload state
+let docUploadState = {};  // { [docKey]: 'uploaded' }
+
+function buildDocUploadCard(scheme) {
+  const card = document.createElement('div');
+  card.className = 'doc-upload-card';
+  card.id = 'docUploadCard';
+  const rows = scheme.docs.map(docKey => `
+    <div class="duc-row" id="ducrow-${docKey}">
+      <span class="duc-icon">📄</span>
+      <div class="duc-body">
+        <div class="duc-doc-name">${DOC_DISPLAY_NAMES[docKey] || docKey}</div>
+        <div class="duc-status" id="ducstatus-${docKey}">Tap to upload or scan</div>
+      </div>
+      <button class="duc-upload-btn" id="ducbtn-${docKey}" onclick="uploadDoc('${docKey}')">📤 Upload</button>
+    </div>`).join('');
+  card.innerHTML = `
+    <div class="duc-header">📤 Upload Documents — ${scheme.name}</div>
+    ${rows}
+    <div class="duc-verify-row">
+      <button class="duc-verify-btn" id="verifyBtn" disabled onclick="runDocVerification()">Verify Documents</button>
+    </div>`;
+  return card;
+}
+
+function uploadDoc(docKey) {
+  docUploadState[docKey] = 'uploaded';
+  const btn = document.getElementById(`ducbtn-${docKey}`);
+  const status = document.getElementById(`ducstatus-${docKey}`);
+  if (btn) { btn.textContent = '✓ Uploaded'; btn.className = 'duc-upload-btn done'; }
+  if (status) { status.textContent = 'Document uploaded'; status.className = 'duc-status uploaded'; }
+  // Enable verify button once all docs uploaded
+  const scheme = selectedScheme;
+  const allUploaded = scheme.docs.every(d => docUploadState[d]);
+  const verifyBtn = document.getElementById('verifyBtn');
+  if (verifyBtn) {
+    if (allUploaded) {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = 'Verify Documents ✓';
+      verifyBtn.style.background = 'var(--gov-blue)';
+    } else {
+      const remaining = scheme.docs.filter(d => !docUploadState[d]).length;
+      verifyBtn.textContent = `Upload ${remaining} more to verify`;
+    }
+  }
+}
+
+function runDocVerification() {
+  const card = document.getElementById('docUploadCard');
+  if (card) card.style.opacity = '0.5';
+  userMessage('Verify my documents');
+  aiMessage('<p>Scanning your documents… checking for validity, name matches, and expiry…</p>', false, true);
+  showThinkingThen(showDocValidationResults, 2200);
 }
 
 function showDocValidationResults() {
@@ -1191,6 +1386,109 @@ function showIncomeCertGuide() {
   );
 }
 
+// ── Portal Card Builders ──
+
+function buildSchemePortalCard(scheme, portal) {
+  const p = userProfile;
+  const card = document.createElement('div');
+  card.className = 'portal-card';
+
+  const steps = portal ? portal.steps.map((s, i) => `
+    <div class="pc-step">
+      <div class="pc-step-num">${i+1}</div>
+      <div class="pc-step-text">${s}</div>
+    </div>`).join('') : '';
+
+  const profileRows = (scheme.formFields || [])
+    .filter(f => f.autofill && p[f.autofill])
+    .map(f => `
+      <div class="pc-data-row">
+        <span class="pc-data-key">${f.label}</span>
+        <span class="pc-data-val">${p[f.autofill]}</span>
+      </div>`).join('');
+
+  const url = portal ? portal.url : '#';
+
+  card.innerHTML = `
+    <div class="pc-header">
+      <div class="pc-eyebrow">${scheme.ministry}</div>
+      <div class="pc-title">${scheme.icon} ${scheme.name}</div>
+      <div class="pc-url">🌐 ${url}</div>
+    </div>
+    ${steps ? `<div class="pc-steps">
+      <div style="font-size:11px;font-weight:700;color:var(--text-low);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">Steps to Apply</div>
+      ${steps}
+    </div>` : ''}
+    ${profileRows ? `<div class="pc-data">
+      <div class="pc-data-label">📋 Your Pre-filled Reference Data</div>
+      <div style="font-size:10px;color:var(--gov-blue);margin-bottom:6px;">Copy these values when filling the portal form</div>
+      ${profileRows}
+    </div>` : ''}
+    <button class="pc-open-btn" onclick="window.open('https://${url}','_blank')">🌐 Open Official Portal →</button>`;
+  return card;
+}
+
+// ── Government Services Guide ──
+
+function showServiceGuide(key) {
+  currentFlow = 'form';
+  const svc = SERVICE_PORTALS[key];
+  if (!svc) { showWelcomeMenu(); return; }
+  setTimeout(() => {
+    userMessage(`${svc.icon} ${svc.name}`);
+    aiMessage(
+      `<p>I'll help you with <strong>${svc.name}</strong> (${svc.dept}).</p>
+       <p>This service is processed on the official government portal. Here are the exact steps and documents needed:</p>`,
+      false, true
+    );
+    setTimeout(() => appendWidget(buildServicePortalCard(svc)), 700);
+    setTimeout(() => {
+      aiMessage(
+        `<p>💡 <strong>Tip:</strong> Keep your Aadhaar and a mobile number handy — most portals use Aadhaar OTP for login.</p>`,
+        false, false
+      );
+      addChipsToLast(`
+        <button class="chip cta chip-appear-1" onclick="window.open('https://${svc.url}','_blank')">🌐 Open ${svc.dept} Portal</button>
+        <button class="chip chip-appear-2" onclick="handleChip('find_schemes')">🔍 Find eligible schemes</button>
+        <button class="chip chip-appear-3" onclick="goBackToLanding()">← More services</button>
+      `);
+    }, 1400);
+  }, 300);
+}
+
+function buildServicePortalCard(svc) {
+  const card = document.createElement('div');
+  card.className = 'portal-card';
+
+  const steps = svc.steps.map((s, i) => `
+    <div class="pc-step">
+      <div class="pc-step-num">${i+1}</div>
+      <div class="pc-step-text">${s}</div>
+    </div>`).join('');
+
+  const docs = svc.docs.map(d => `
+    <div class="pc-data-row">
+      <span class="pc-data-key">📄 ${d}</span>
+    </div>`).join('');
+
+  card.innerHTML = `
+    <div class="pc-header">
+      <div class="pc-eyebrow">${svc.dept}</div>
+      <div class="pc-title">${svc.icon} ${svc.name}</div>
+      <div class="pc-url">🌐 ${svc.url}</div>
+    </div>
+    <div class="pc-steps">
+      <div style="font-size:11px;font-weight:700;color:var(--text-low);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">How to Apply</div>
+      ${steps}
+    </div>
+    <div class="pc-data">
+      <div class="pc-data-label">📋 Documents Required</div>
+      ${docs}
+    </div>
+    <button class="pc-open-btn" onclick="window.open('https://${svc.url}','_blank')">🌐 Open Official Portal →</button>`;
+  return card;
+}
+
 // ═══════════════════════════
 // FLOW 3: FORM FILLING
 // ═══════════════════════════
@@ -1199,16 +1497,24 @@ function startFormFlowDirect() {
   currentFlow = 'form';
   if (!selectedScheme && eligibilityResults.length) selectedScheme = eligibilityResults[0];
   if (!selectedScheme) selectedScheme = SCHEMES[0];
+  const portal = SCHEME_PORTALS[selectedScheme.id];
   setTimeout(() => {
     aiMessage(
-      `<p>I'll help you fill the <strong>${selectedScheme.name}</strong> application form.</p>
-       <p>How would you like to proceed?</p>`,
-      false, false
+      `<p>I'll help you apply for <strong>${selectedScheme.name}</strong>.</p>
+       <p>Applications must be submitted on the <strong>official government portal</strong>. I've prepared your data and steps below — just open the portal and paste in the values.</p>`,
+      false, true
     );
-    addChipsToLast(`
-      <button class="chip cta chip-appear-1" onclick="handleChip('autofill_form')">✨ Auto-fill from my profile</button>
-      <button class="chip chip-appear-2" onclick="handleChip('guided_form')">Guide me step by step</button>
-    `);
+    setTimeout(() => appendWidget(buildSchemePortalCard(selectedScheme, portal)), 600);
+    setTimeout(() => {
+      aiMessage(
+        `<p>💡 <strong>You don't need to visit any office.</strong> This is 100% online and takes about 5 minutes to complete.</p>`,
+        false, false
+      );
+      addChipsToLast(`
+        <button class="chip cta chip-appear-1" onclick="window.open('https://${portal ? portal.url : '#'}','_blank')">🌐 Open Official Portal</button>
+        <button class="chip chip-appear-2" onclick="handleChip('check_docs:${selectedScheme.id}')">📋 Check my documents first</button>
+      `);
+    }, 1400);
   }, 300);
 }
 
@@ -1219,31 +1525,8 @@ function startFormFlow(schemeId) {
 }
 
 function startAutoFillForm() {
-  const scheme = selectedScheme;
-  const fields = scheme.formFields || SCHEMES[0].formFields;
-  const profile = userProfile;
-  const filledCount = fields.filter(f => f.autofill && profile[f.autofill]).length;
-  const fillPct = Math.round((filledCount / fields.length) * 100);
-
-  setTimeout(() => {
-    aiMessage(
-      `<p>I've auto-filled <strong>${filledCount} of ${fields.length} fields</strong> from your profile. Review and submit when ready.</p>`,
-      false, true
-    );
-    setTimeout(() => {
-      appendWidget(buildFormSimCard(scheme, fields, profile, fillPct));
-      setTimeout(() => {
-        aiMessage(
-          `<p>💡 <strong>You don't need to visit any office.</strong> This application is 100% online and takes about 2 minutes to submit on the official portal.</p>`,
-          false, false
-        );
-        addChipsToLast(`
-          <button class="chip cta chip-appear-1" onclick="handleChip('form_done')">✅ Mark as ready to submit</button>
-          <button class="chip chip-appear-2" onclick="handleChip('guided_form')">Edit a field</button>
-        `);
-      }, 500);
-    }, 400);
-  }, 300);
+  // Now redirects to official portal with pre-filled data summary
+  startFormFlowDirect();
 }
 
 function buildFormSimCard(scheme, fields, profile, fillPct) {
@@ -1308,23 +1591,28 @@ function advanceFormField() {
 }
 
 function showFormReadyCard() {
+  const scheme = selectedScheme;
+  const portal = scheme ? SCHEME_PORTALS[scheme.id] : null;
+  const url = portal ? portal.url : '#';
   const card = document.createElement('div');
   card.className = 'form-ready-card';
   card.innerHTML = `
     <div class="frc-icon">✅</div>
-    <div class="frc-title">Form Ready to Submit</div>
-    <div class="frc-msg">All fields are complete. Your <strong>${selectedScheme?.name || 'application'}</strong> form is ready. Submit it on the official government portal to complete your application.</div>
-    <div class="frc-note">🖥️ You don't need to visit any office — submit online in 2 minutes</div>`;
+    <div class="frc-title">Data Ready — Open Official Portal</div>
+    <div class="frc-msg">All your details are prepared. Go to the <strong>official government portal</strong> to complete and submit your application.<br><br>🌐 <strong style="font-family:monospace;">${url}</strong></div>
+    <div class="frc-note">🖥️ You don't need to visit any office — submit online in 2 minutes</div>
+    <button style="margin-top:14px;background:var(--gov-blue);color:#fff;border:none;border-radius:var(--shape-pill);padding:12px 24px;font-size:14px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;width:100%;" onclick="window.open('https://${url}','_blank')">🌐 Open Official Portal →</button>`;
   appendWidget(card);
   setTimeout(() => {
     aiMessage(
-      `<p>🎉 Congratulations! Your application form is ready.</p>
-       <p>Submit on the <strong>official portal</strong> — your data has been verified and should process quickly.</p>`,
+      `<p>🎉 You're all set! Open the official portal to complete submission.</p>
+       <p>Your reference data is ready — just paste it in when the portal asks.</p>`,
       true, false
     );
     addChipsToLast(`
-      <button class="chip cta chip-appear-1" onclick="enterChat('eligibility')">🔍 Find more schemes</button>
-      <button class="chip chip-appear-2" onclick="goBackToLanding()">← Back to Home</button>
+      <button class="chip cta chip-appear-1" onclick="window.open('https://${url}','_blank')">🌐 Open Portal</button>
+      <button class="chip chip-appear-2" onclick="handleChip('find_schemes')">🔍 Find more schemes</button>
+      <button class="chip chip-appear-3" onclick="goBackToLanding()">← Home</button>
     `);
   }, 500);
 }
