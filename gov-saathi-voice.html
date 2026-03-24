@@ -380,11 +380,17 @@ const SC = {
 // ── Voice loading ──
 function getBestVoice() {
   const voices = synth.getVoices();
-  return voices.find(v => v.lang === 'hi-IN' && /male/i.test(v.name))
+  // Priority order — most natural Indian accent first:
+  // 1. Lekha     → iOS built-in, best Indian Hindi voice
+  // 2. Google हिन्दी / Google Hindi → Android, sounds natural
+  // 3. Swara     → Windows Microsoft Indian voice
+  // 4. Any hi-IN → whatever is available
+  // 5. null      → let browser pick; do NOT fall back to English voice
+  return voices.find(v => /lekha/i.test(v.name))
+    || voices.find(v => /google/i.test(v.name) && v.lang === 'hi-IN')
+    || voices.find(v => /swara/i.test(v.name))
     || voices.find(v => v.lang === 'hi-IN')
     || voices.find(v => v.lang.startsWith('hi'))
-    || voices.find(v => v.default)
-    || voices[0]
     || null;
 }
 function loadVoices() { hindiVoice = getBestVoice(); }
@@ -425,8 +431,8 @@ function speak(text, onDone) {
   const utt = new SpeechSynthesisUtterance(text);
   if (voice) { utt.voice = voice; utt.lang = voice.lang; }
   else { utt.lang = 'hi-IN'; }
-  utt.rate   = 0.88;
-  utt.pitch  = 0.92;
+  utt.rate   = 0.82;  // slower = more natural Indian cadence
+  utt.pitch  = 1.05;  // slightly higher = authentic Indian Hindi tone
   utt.volume = 1.0;
   isSpeaking = true;
   setMicState('speaking');
