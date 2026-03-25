@@ -222,16 +222,16 @@ let currentAudio = null;
 let recognition  = null;
 let docUploaded  = {};
 
-// ── Conversation script ──
+// ── Conversation script (Devanagari — gives Sarvam authentic Indian accent) ──
 const SC = {
-  greet:   "Namaste! Main Sarkar Saathi hoon — aapka sarkari yojana mein madad karne wala AI saathi. Bataiye, kya madad chahiye?",
-  ack0:    "Zaroor! Pehle mujhe thodi si jaankari chahiye.",
-  q1:      "Pehla sawaal — aap kya kaam karte hain? Kheti karte hain, ya koi naukri, ya kuch aur?",
-  ack1:    "Achha, aap kisan hain. Bahut achha.",
-  q2:      "Ab bataiye — ghar ki saal bhar ki kamaai karib kitni hai? Ek lakh se kam hai, ya zyada?",
-  result:  "Mujhe ek bahut achhi scheme mili! PM Kisan Samman Nidhi. Isme aapko har saal chha hazaar rupaye milenge — do do hazaar ki teen kisht mein, seedha bank account mein. Yeh scheme bilkul aap jaise chote kisanon ke liye bani hai.",
-  askDocs: "Kya aap jaanna chahenge ki is scheme ke liye kaun se documents chahiye?",
-  docs:    "Is scheme ke liye teen cheezein chahiye. Ek — Aadhaar card. Do — Zameen ka record yaani Khatauni. Teen — Bank passbook. Inhe upload karke verify karo, main check karunga.",
+  greet:   "नमस्ते! मैं सरकार साथी हूँ — आपका सरकारी योजना में मदद करने वाला AI साथी। बताइए, क्या मदद चाहिए?",
+  ack0:    "ज़रूर! पहले मुझे थोड़ी सी जानकारी चाहिए।",
+  q1:      "पहला सवाल — आप क्या काम करते हैं? खेती करते हैं, या कोई नौकरी, या कुछ और?",
+  ack1:    "अच्छा, आप किसान हैं। बहुत अच्छा।",
+  q2:      "अब बताइए — घर की साल भर की कमाई कितनी है? एक लाख से कम है, या ज़्यादा?",
+  result:  "मुझे एक बहुत अच्छी योजना मिली! पीएम किसान सम्मान निधि। इसमें आपको हर साल छह हज़ार रुपये मिलेंगे — दो दो हज़ार की तीन किश्त में, सीधे बैंक अकाउंट में। यह योजना बिल्कुल आप जैसे छोटे किसानों के लिए बनी है।",
+  askDocs: "क्या आप जानना चाहेंगे कि इस योजना के लिए कौन से दस्तावेज़ चाहिए?",
+  docs:    "इस योजना के लिए तीन चीज़ें चाहिए। एक — आधार कार्ड। दो — ज़मीन का रिकॉर्ड यानी खतौनी। तीन — बैंक पासबुक। इन्हें अपलोड करके वेरीफाई करो, मैं चेक करूँगा।",
 };
 
 // ══════════════════════════════════════
@@ -302,10 +302,10 @@ function fallbackSpeak(text, onDone) {
 // ══════════════════════════════════════
 function setMic(state) {
   const S = {
-    idle:     { bg:'var(--blue)', rings:false, status:'Tap karke baat karo',    hint:'🎙️ Aap baat kar sakte hain' },
-    listening:{ bg:'#e53935',    rings:true,  status:'🔴  Sun raha hoon...',    hint:'Boliye, main sun raha hoon' },
-    speaking: { bg:'var(--blue)', rings:false, status:'🔊  Bol raha hoon...',   hint:'Sarkar Saathi bol raha hai' },
-    loading:  { bg:'#6b7280',    rings:false, status:'⏳  Dhundh raha hoon...', hint:'Ek second...' },
+    idle:     { bg:'var(--blue)', rings:false, status:'टैप करके बात करो',     hint:'🎙️ आप बात कर सकते हैं' },
+    listening:{ bg:'#e53935',    rings:true,  status:'🔴  सुन रहा हूँ...',     hint:'बोलिए, मैं सुन रहा हूँ' },
+    speaking: { bg:'var(--blue)', rings:false, status:'🔊  बोल रहा हूँ...',    hint:'सरकार साथी बोल रहा है' },
+    loading:  { bg:'#6b7280',    rings:false, status:'⏳  ढूंढ रहा हूँ...',    hint:'एक सेकंड...' },
   };
   const s = S[state] || S.idle;
   $micBtn.style.background = s.bg;
@@ -406,8 +406,8 @@ function verifyDocs() {
   setMic('loading');
   setTimeout(() => {
     hideTyping();
-    addAI('✅ Aadhaar — Bilkul theek<br>⚠️ Khatauni — Naam mein antar: <strong>"Ramesh Kuma"</strong> vs <strong>"Ramesh Kumar"</strong><br>✅ Bank passbook — Theek hai');
-    speak("Aapke do documents theek hain. Lekin zameen ke record mein naam mein thoda antar hai. Ramesh Kuma likha hua hai, jabki Aadhaar mein Ramesh Kumar hai. Yeh ek chhoti si baat hai — tehsil office mein free mein theek ho jaata hai, sirf saat se dus din mein. Baaki sab bilkul taiyaar hai!", () => setMic('idle'));
+    addAI('✅ आधार — बिल्कुल ठीक<br>⚠️ खतौनी — नाम में अंतर: <strong>"Ramesh Kuma"</strong> vs <strong>"Ramesh Kumar"</strong><br>✅ बैंक पासबुक — ठीक है');
+    speak("आपके दो दस्तावेज़ बिल्कुल ठीक हैं। लेकिन ज़मीन के रिकॉर्ड में नाम में थोड़ा अंतर है। रमेश कुमा लिखा हुआ है, जबकि आधार में रमेश कुमार है। यह एक छोटी सी बात है — तहसील ऑफिस में मुफ़्त में ठीक हो जाता है, सिर्फ़ सात से दस दिन में। बाकी सब बिल्कुल तैयार है!", () => setMic('idle'));
   }, 2200);
 }
 
@@ -415,10 +415,10 @@ function verifyDocs() {
 // CONVERSATION TURNS
 // ══════════════════════════════════════
 const DEMO_DEFAULTS = [
-  "Mujhe government scheme ke baare mein jaanna hai",
-  "Kheti karta hoon",
-  "Ek lakh se kam hai",
-  "Haan, zaroor batao"
+  "मुझे सरकारी योजना के बारे में जानना है",
+  "खेती करता हूँ",
+  "एक लाख से कम है",
+  "हाँ, ज़रूर बताओ"
 ];
 
 function processUserTurn(said) {
@@ -435,7 +435,7 @@ function processUserTurn(said) {
       setTimeout(() => {
         hideTyping();
         addAI(SC.ack0 + '<br><br>' + SC.q1);
-        speak(SC.ack0 + ' ' + SC.q1, () => setMic('idle'));
+        speak(SC.ack0 + ' ' + SC.q1, () => setMic('idle')); // Devanagari → native accent
       }, 700);
     }, 350);
 
