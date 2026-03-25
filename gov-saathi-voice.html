@@ -148,6 +148,17 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#d4d4d4;display:f
 .rcl-msg{font-size:12px;margin-top:2px;color:var(--text2);}
 .rcl-row.warn .rcl-msg{color:var(--orange);}
 
+/* ════════ ACTION CARD (naam fix steps) ════════ */
+.action-card{border-radius:14px;border:1px solid var(--stroke);background:#fff;animation:bUp 380ms ease-out;width:100%;}
+.ac-hd{background:var(--green);color:#fff;padding:10px 14px;font-size:13px;font-weight:700;border-radius:14px 14px 0 0;}
+.ac-step{display:flex;align-items:flex-start;gap:12px;padding:11px 14px;border-bottom:1px solid var(--stroke);}
+.ac-step:last-child{border-bottom:none;}
+.ac-ico{font-size:20px;flex-shrink:0;margin-top:1px;}
+.ac-txt{font-size:13px;font-weight:700;color:var(--text);line-height:1.4;}
+.ac-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.ac-pill{display:inline-block;background:var(--green-bg);color:var(--green);border-radius:var(--pill);padding:2px 10px;font-size:11px;font-weight:700;margin-top:4px;}
+.ac-pill.free{background:#e6f4ec;color:#1a6b3c;}
+
 /* ════════ MIC BAR ════════ */
 .mic-bar{flex-shrink:0;padding:8px 24px 20px;background:#fff;
   display:flex;flex-direction:column;align-items:center;gap:5px;
@@ -237,6 +248,7 @@ const $mHint   = document.getElementById('micHint');
 
 // ── State ──
 let turn         = 0;
+let docPhase     = null;   // 'awaiting_fix' after follow-up question
 let listening    = false;
 let speaking     = false;
 let currentAudio = null;
@@ -467,11 +479,80 @@ function verifyDocs() {
       speakThen(resultSpeech, () => {
         setTimeout(() => {
           addAI("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?");
-          speak("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?", () => setMic('idle'));
+          speak("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?", () => {
+            docPhase = 'awaiting_fix';
+            setMic('idle');
+          });
         }, 500);
       }, 12000);
     });
   }, 500);
+}
+
+function showNaamFix() {
+  showTyping();
+  setMic('loading');
+  setTimeout(() => {
+    hideTyping();
+
+    // Action card — step by step
+    const card = document.createElement('div');
+    card.className = 'action-card';
+    card.innerHTML = `
+      <div class="ac-hd">✏️ नाम सुधार — कैसे करें?</div>
+      <div class="ac-step">
+        <span class="ac-ico">📍</span>
+        <div>
+          <div class="ac-txt">अपनी तहसील ऑफिस जाएं</div>
+          <div class="ac-sub">नज़दीकी तहसील या राजस्व विभाग का दफ़्तर</div>
+        </div>
+      </div>
+      <div class="ac-step">
+        <span class="ac-ico">📄</span>
+        <div>
+          <div class="ac-txt">ये दस्तावेज़ साथ लाएं</div>
+          <div class="ac-sub">आधार कार्ड + पुरानी खतौनी (दोनों की फ़ोटोकॉपी भी)</div>
+        </div>
+      </div>
+      <div class="ac-step">
+        <span class="ac-ico">📝</span>
+        <div>
+          <div class="ac-txt">नाम सुधार आवेदन फ़ॉर्म भरें</div>
+          <div class="ac-sub">काउंटर पर मिलेगा — बस आधार वाला सही नाम लिखें</div>
+        </div>
+      </div>
+      <div class="ac-step">
+        <span class="ac-ico">⏱️</span>
+        <div>
+          <div class="ac-txt">७ से १० दिन में नाम ठीक हो जाएगा</div>
+          <span class="ac-pill free">बिल्कुल मुफ़्त · कोई फ़ीस नहीं</span>
+        </div>
+      </div>
+      <div class="ac-step">
+        <span class="ac-ico">🌾</span>
+        <div>
+          <div class="ac-txt">उसके बाद PM Kisan के लिए अप्लाई करें</div>
+          <div class="ac-sub">₹6,000 सालाना — सीधे बैंक में</div>
+        </div>
+      </div>`;
+    $conv.appendChild(card);
+    scrollDown();
+
+    const fixSpeech =
+      "बिल्कुल। यह काम बहुत आसान है। " +
+      "बस अपनी तहसील ऑफिस जाइए — साथ में आधार कार्ड और खतौनी लेकर। " +
+      "वहाँ नाम सुधार का एक फ़ॉर्म मिलेगा, उसे भरकर जमा कर दीजिए। " +
+      "यह बिल्कुल मुफ़्त है, कोई पैसा नहीं लगता। " +
+      "सात से दस दिन में आपकी खतौनी में नाम ठीक हो जाएगा। " +
+      "उसके बाद आप पीएम किसान के लिए अप्लाई कर सकते हैं और हर साल छह हज़ार रुपये पा सकते हैं।";
+
+    speakThen(fixSpeech, () => {
+      setTimeout(() => {
+        addAI("बस इतना ही करना है। आप यह ज़रूर कर सकते हैं! 🌾");
+        speak("बस इतना ही करना है। आप यह ज़रूर कर सकते हैं!", () => setMic('idle'));
+      }, 600);
+    }, 14000);
+  }, 700);
 }
 
 function buildScanCard() {
@@ -618,6 +699,12 @@ function onMicTap() {
   if (listening) {
     try { recognition?.stop(); } catch(e) {} return;
   }
+  if (docPhase === 'awaiting_fix') {
+    docPhase = null;
+    addUser("हाँ, बताओ");
+    showNaamFix();
+    return;
+  }
   if (turn > 3) return;
   startListening();
 }
@@ -677,7 +764,7 @@ function resetToLanding() {
   window.speechSynthesis?.cancel();
   try { recognition?.stop(); } catch(e) {}
   speaking = listening = false;
-  turn = 0; docUploaded = {};
+  turn = 0; docUploaded = {}; docPhase = null;
   $conv.innerHTML = '';
   $conv.style.display = 'none';
   document.getElementById('vHdr').style.display   = 'none';
