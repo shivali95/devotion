@@ -626,26 +626,84 @@ function verifyDocs() {
         "बैंक पासबुक — ठीक है।";
 
       speakThen(resultSpeech, () => {
-        // ── Step 2: explain how to fix the name ──
+        // ── Step 2: explain correction is free ──
         setTimeout(() => {
-          addAI("खतौनी में नाम की यह गलती तहसील ऑफिस में <strong>मुफ़्त</strong> में ठीक होती है — बस ७ दिन लगते हैं।<br><br>📍 तहसील ऑफिस जाएं<br>📄 आधार + पुरानी खतौनी लाएं<br>📝 नाम सुधार फ़ॉर्म भरें");
-          speakThen(
-            "खतौनी में नाम की यह गलती तहसील ऑफिस में मुफ़्त में ठीक होती है। आधार कार्ड और पुरानी खतौनी साथ लेकर जाएं, नाम सुधार का फ़ॉर्म भरें। सात दिन में नाम ठीक हो जाएगा।",
+          addAI("खतौनी में नाम की यह गलती <strong>बिल्कुल मुफ़्त</strong> में ठीक होती है — बस ७ दिन लगते हैं।");
+          speak(
+            "अच्छी बात यह है कि यह गलती बिल्कुल मुफ़्त में ठीक होती है — कोई पैसा नहीं लगता। बस सात दिन का काम है।",
             () => {
-              // ── Step 3: ask to re-upload corrected khatauni ──
+              // ── Step 3: ask about nearby office ──
               setTimeout(() => {
-                addAI("अब ठीक की हुई खतौनी स्कैन करें — मैं दोबारा जाँचूँगा।");
-                speak("अब ठीक की हुई खतौनी स्कैन करें।", () => {
-                  showReUploadCard();
+                addAI("क्या मैं आपको पास का तहसील ऑफिस बताऊँ जहाँ जाकर यह ठीक करा सकते हैं?");
+                speak("क्या मैं आपको पास का तहसील ऑफिस बताऊँ जहाँ जाकर यह ठीक करा सकते हैं?", () => {
+                  docPhase = 'awaiting_office_help';
                   setMic('idle');
                 });
-              }, 600);
-            }, 10000
+              }, 500);
+            }
           );
         }, 600);
       }, 12000);
     });
   }, 500);
+}
+
+function showNearbyOffice() {
+  showTyping(); setMic('loading');
+  setTimeout(() => {
+    hideTyping();
+
+    // Office card
+    const card = document.createElement('div');
+    card.className = 'action-card';
+    card.innerHTML = `
+      <div class="ac-hd">📍 नज़दीकी तहसील ऑफिस</div>
+      <div class="ac-step">
+        <span class="ac-ico">🏢</span>
+        <div>
+          <div class="ac-txt">तहसील कार्यालय, लखनऊ सदर</div>
+          <div class="ac-sub">विकास भवन, गोमती नगर, लखनऊ · 2.4 km दूर</div>
+          <div class="ac-sub" style="margin-top:3px;">⏰ सोम–शनि, सुबह 10 से शाम 5 बजे</div>
+        </div>
+      </div>
+      <div class="ac-hd" style="background:var(--blue);border-radius:0;margin-top:0">📋 आपको क्या लेकर जाना है?</div>
+      <div class="ac-step">
+        <span class="ac-ico">🪪</span>
+        <div>
+          <div class="ac-txt">आधार कार्ड</div>
+          <div class="ac-sub">Original + एक फ़ोटोकॉपी</div>
+        </div>
+      </div>
+      <div class="ac-step">
+        <span class="ac-ico">📜</span>
+        <div>
+          <div class="ac-txt">पुरानी खतौनी</div>
+          <div class="ac-sub">Original + एक फ़ोटोकॉपी</div>
+        </div>
+      </div>
+      <div class="ac-step" style="background:#e6f4ec;border-radius:0 0 14px 14px;">
+        <span class="ac-ico">📝</span>
+        <div>
+          <div class="ac-txt">काउंटर पर नाम सुधार फ़ॉर्म भरें</div>
+          <div class="ac-sub">फ़ॉर्म वहीं मिलेगा — कोई अलग से लाने की ज़रूरत नहीं</div>
+          <span class="ac-pill free">बिल्कुल मुफ़्त · कोई फ़ीस नहीं</span>
+        </div>
+      </div>`;
+    $conv.appendChild(card); scrollDown();
+
+    speakThen(
+      "नज़दीकी तहसील ऑफिस — विकास भवन, गोमती नगर — वहाँ दो चीज़ें लेकर जाएं। एक — आधार कार्ड, और दो — पुरानी खतौनी। दोनों की एक-एक फ़ोटोकॉपी भी साथ रखें। काउंटर पर पहुँचकर नाम सुधार फ़ॉर्म माँगें — वह वहीं मिलेगा, कोई पैसा नहीं लगता।",
+      () => {
+        setTimeout(() => {
+          addAI("ठीक है! जब नाम सुधर जाए तो नई खतौनी यहाँ अपलोड करें — मैं दोबारा जाँचूँगा।");
+          speak("ठीक है! जब नाम सुधर जाए तो नई खतौनी यहाँ अपलोड करें।", () => {
+            showReUploadCard();
+            setMic('idle');
+          });
+        }, 600);
+      }, 12000
+    );
+  }, 900);
 }
 
 function showReUploadCard() {
@@ -1118,6 +1176,12 @@ function onMicTap() {
   // When web overlay is open, mic tap advances to next field
   if (webOverlayOpen && formPhase && formPhase.startsWith('field_')) {
     advanceFormField();
+    return;
+  }
+  if (docPhase === 'awaiting_office_help') {
+    docPhase = null;
+    addUser("हाँ, बताओ");
+    showNearbyOffice();
     return;
   }
   if (docPhase === 'awaiting_form_help') {
