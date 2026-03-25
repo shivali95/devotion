@@ -36,23 +36,36 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#d4d4d4;display:f
 .ld-name{font-size:28px;font-weight:900;color:#0c0d10;letter-spacing:-.035em;margin-bottom:5px;}
 .ld-tag{font-size:13px;color:rgba(12,13,16,.5);font-weight:500;text-align:center;line-height:1.7;margin-bottom:20px;}
 
-/* Services grid */
-.ld-svc-section{width:100%;margin-bottom:20px;}
-.ld-svc-title{font-size:11px;font-weight:700;color:rgba(12,13,16,.4);
-  text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
-.ld-svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+/* Primary action cards */
+.ld-section-title{font-size:11px;font-weight:700;color:rgba(12,13,16,.38);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;width:100%;}
+.primary-action{display:flex;align-items:center;gap:12px;background:#fff;
+  border:1.5px solid rgba(36,38,43,.1);border-radius:14px;padding:13px 14px;
+  cursor:pointer;transition:background 150ms,transform 100ms,border-color 150ms;
+  margin-bottom:8px;width:100%;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.primary-action:last-of-type{margin-bottom:0;}
+.primary-action:active{background:#f0f4ff;transform:scale(.98);border-color:var(--blue);}
+.pa-ico{font-size:22px;flex-shrink:0;}
+.pa-body{flex:1;}
+.pa-label{font-size:14px;font-weight:700;color:#0c0d10;line-height:1.2;}
+.pa-sub{font-size:11px;color:rgba(12,13,16,.45);margin-top:2px;}
+.pa-arr{font-size:18px;color:rgba(12,13,16,.25);flex-shrink:0;}
+
+/* Services strip */
+.ld-svc-section{width:100%;margin-top:16px;margin-bottom:0;}
+.ld-svc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
 .svc-chip{background:#fff;border:1.5px solid rgba(36,38,43,.1);
-  border-radius:12px;padding:12px 6px 10px;display:flex;flex-direction:column;
-  align-items:center;gap:5px;cursor:pointer;transition:background 150ms,transform 100ms;
-  box-shadow:0 2px 8px rgba(0,0,0,.05);}
-.svc-chip:active{background:#f0f4ff;transform:scale(.96);}
-.svc-ico{font-size:22px;}
-.svc-name{font-size:11px;font-weight:600;color:#0c0d10;text-align:center;line-height:1.3;}
+  border-radius:12px;padding:11px 12px;display:flex;align-items:center;
+  gap:9px;cursor:pointer;transition:background 150ms,transform 100ms;
+  box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.svc-chip:active{background:#f0f4ff;transform:scale(.97);}
+.svc-ico{font-size:20px;flex-shrink:0;}
+.svc-name{font-size:12px;font-weight:600;color:#0c0d10;}
 
 /* Or divider */
-.ld-or{font-size:12px;color:rgba(12,13,16,.38);margin:4px 0 16px;
+.ld-or{font-size:12px;color:rgba(12,13,16,.3);margin:14px 0 10px;
   display:flex;align-items:center;gap:10px;width:100%;}
-.ld-or::before,.ld-or::after{content:'';flex:1;height:1px;background:rgba(12,13,16,.1);}
+.ld-or::before,.ld-or::after{content:'';flex:1;height:1px;background:rgba(12,13,16,.08);}
 
 .orb-wrap{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;margin-bottom:28px;}
 .orb-ring{position:absolute;border-radius:50%;border:2px solid rgba(0,53,128,.15);pointer-events:none;}
@@ -319,31 +332,58 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#d4d4d4;display:f
 <div class="landing" id="landing">
   <div class="ld-logo">🏛️</div>
   <div class="ld-name">Nagrik AI</div>
-  <div class="ld-tag">Sarkari yojana · Documents · Forms<br>Hindi mein, awaaz se</div>
+  <div class="ld-tag">Sarkari kaam, aasaan — Hindi mein</div>
 
+  <!-- Primary Actions -->
+  <div class="ld-section-title">Main Actions</div>
+
+  <div class="primary-action" onclick="startConv('scheme')">
+    <span class="pa-ico">🔍</span>
+    <div class="pa-body">
+      <div class="pa-label">Find the right scheme for me</div>
+      <div class="pa-sub">PM Kisan · Ayushman · PM Awas + more</div>
+    </div>
+    <span class="pa-arr">›</span>
+  </div>
+
+  <div class="primary-action" onclick="startConv('docs')">
+    <span class="pa-ico">📋</span>
+    <div class="pa-body">
+      <div class="pa-label">Check my documents</div>
+      <div class="pa-sub">Verify · Find issues · Fix problems</div>
+    </div>
+    <span class="pa-arr">›</span>
+  </div>
+
+  <div class="primary-action" onclick="startConv('form')">
+    <span class="pa-ico">✍️</span>
+    <div class="pa-body">
+      <div class="pa-label">Apply or fill a form</div>
+      <div class="pa-sub">Voice-guided · Auto-fill · Step by step</div>
+    </div>
+    <span class="pa-arr">›</span>
+  </div>
+
+  <!-- Services -->
   <div class="ld-svc-section">
-    <div class="ld-svc-title">Popular Services</div>
+    <div class="ld-section-title">Services</div>
     <div class="ld-svc-grid">
-      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🪪</span><span class="svc-name">Aadhaar Card</span></div>
-      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🛂</span><span class="svc-name">Passport</span></div>
-      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">💳</span><span class="svc-name">PAN Card</span></div>
-      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🌾</span><span class="svc-name">PM Kisan</span></div>
-      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🏥</span><span class="svc-name">Ayushman Bharat</span></div>
-      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🏠</span><span class="svc-name">PM Awas</span></div>
+      <div class="svc-chip" onclick="startConv('aadhaar')"><span class="svc-ico">🪪</span><span class="svc-name">Aadhaar Card</span></div>
+      <div class="svc-chip" onclick="startConv('passport')"><span class="svc-ico">🛂</span><span class="svc-name">Passport</span></div>
+      <div class="svc-chip" onclick="startConv('pan')"><span class="svc-ico">💳</span><span class="svc-name">PAN Card</span></div>
+      <div class="svc-chip" onclick="startConv('driving')"><span class="svc-ico">🚗</span><span class="svc-name">Driving Licence</span></div>
     </div>
   </div>
 
+  <!-- Voice shortcut -->
   <div class="ld-or">या सीधे बात करो</div>
-
-  <div class="orb-wrap">
-    <div class="orb-ring orb-ring-1"></div>
-    <div class="orb-ring orb-ring-2"></div>
-    <div class="orb-ring orb-ring-3"></div>
-    <button class="orb-btn" onclick="startConv()">
-      <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
+  <div class="orb-wrap" style="width:70px;height:70px;margin-bottom:14px;">
+    <div class="orb-ring orb-ring-1" style="width:70px;height:70px;"></div>
+    <div class="orb-ring orb-ring-2" style="width:92px;height:92px;"></div>
+    <button class="orb-btn" style="width:54px;height:54px;" onclick="startConv()">
+      <svg viewBox="0 0 24 24" style="width:26px;height:26px;"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>
     </button>
   </div>
-  <div class="ld-hint">Tap karke baat karo</div>
   <div class="ld-pill">
     <div class="ld-dot"></div>
     <span class="ld-pill-txt">Sarvam AI · Asli Hindi Awaaz · Live</span>
@@ -1234,7 +1274,19 @@ function setupRecognition() {
   recognition.interimResults = false;
 }
 
-function startConv() {
+function startConv(intent) {
+  // Intent-specific greetings — all route into the same existing flow
+  const greetMap = {
+    scheme:  "नमस्ते! मैं नागरिक साथी हूँ। आपके लिए सबसे सही सरकारी योजना ढूंढूँगा। पहले कुछ सवाल पूछूँगा।",
+    docs:    "नमस्ते! मैं नागरिक साथी हूँ। आपके दस्तावेज़ जाँचूँगा। पहले बताइए, आप क्या काम करते हैं?",
+    form:    "नमस्ते! मैं नागरिक साथी हूँ। फ़ॉर्म भरने में आवाज़ से मदद करूँगा। पहले कुछ जानकारी लेता हूँ।",
+    aadhaar: "नमस्ते! आधार कार्ड से जुड़ी मदद के लिए मैं यहाँ हूँ। बताइए, क्या करना है — अपडेट, नई एनरोलमेंट, या कुछ और?",
+    passport:"नमस्ते! पासपोर्ट के लिए मदद करूँगा। बताइए — नया पासपोर्ट बनाना है, या रिन्यू करना है?",
+    pan:     "नमस्ते! PAN कार्ड के लिए मदद करूँगा। नया बनाना है, या कोई सुधार करना है?",
+    driving: "नमस्ते! ड्राइविंग लाइसेंस के लिए मदद करूँगा। नया बनाना है, या रिन्यू करना है?",
+  };
+  SC.greet = greetMap[intent] || SC.greet;
+
   document.getElementById('landing').classList.add('exit');
   setTimeout(() => {
     document.getElementById('landing').style.display = 'none';
