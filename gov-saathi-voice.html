@@ -392,36 +392,7 @@ function showSchemeCard() {
   $conv.appendChild(c); scrollDown();
 }
 
-function showDocCard() {
-  const c = document.createElement('div');
-  c.className = 'doc-card';
-  c.innerHTML = `
-    <div class="doc-hd">📤 Documents chahiye — PM Kisan</div>
-    ${[['🪪','Aadhaar Card','d0'],['📜','Zameen ka Record (Khatauni)','d1'],['🏦','Bank Passbook','d2']].map(([ico,name,id])=>`
-    <div class="doc-row">
-      <span class="doc-ico">${ico}</span>
-      <div class="doc-info"><div class="doc-name">${name}</div><div class="doc-st" id="st-${id}">Upload karein</div></div>
-      <button class="doc-btn" id="btn-${id}" onclick="tapDoc('${id}')">📤 Upload</button>
-    </div>`).join('')}
-    <div class="doc-verify-row">
-      <button class="doc-verify" id="verifyBtn" disabled onclick="verifyDocs()">Verify Karo</button>
-    </div>`;
-  $conv.appendChild(c); scrollDown();
-}
-
-function tapDoc(id) {
-  docUploaded[id] = true;
-  document.getElementById('btn-'+id).className = 'doc-btn done';
-  document.getElementById('btn-'+id).textContent = '✓ Ho gaya';
-  document.getElementById('st-'+id).textContent  = 'Upload ho gaya';
-  document.getElementById('st-'+id).className    = 'doc-st ok';
-  if (docUploaded.d0 && docUploaded.d1 && docUploaded.d2) {
-    const v = document.getElementById('verifyBtn');
-    v.disabled = false; v.textContent = '✓ Verify Karo';
-  }
-}
-
-// speakThen: like speak() but guarantees onDone fires even if TTS callback stalls
+// speakThen: speak + guaranteed onDone even if TTS callback stalls
 function speakThen(text, onDone, timeoutMs) {
   let fired = false;
   function finish() { if (!fired) { fired = true; onDone?.(); } }
@@ -429,28 +400,26 @@ function speakThen(text, onDone, timeoutMs) {
   setTimeout(finish, timeoutMs || 10000);
 }
 
-function verifyDocs() {
-  // Phase 1: User message + fade doc card
-  addUser("वेरीफाई करो");
-  const docCard = $conv.querySelector('.doc-card');
-  if (docCard) docCard.style.opacity = '0.5';
+// Auto-triggered after AI finishes speaking about docs
+function startDocScan() {
+  // Simulate user sending their documents
+  addUser("यह रहे मेरे दस्तावेज़ 📎");
 
-  // Fire "checking" speech — visuals DON'T wait for it (decoupled)
+  // "Checking now" plays while scan card appears
   speak("ठीक है, अभी जाँच करता हूँ...", null);
 
-  // Phase 2: Scan card appears after short delay regardless of speech state
   setTimeout(() => {
     const scanCard = buildScanCard();
     $conv.appendChild(scanCard);
     scrollDown();
 
     animateScan(scanCard, () => {
-      // Phase 3: Results checklist card
+      // Results checklist appears
       const cl = buildResultChecklist();
       $conv.appendChild(cl);
       scrollDown();
 
-      // Speak results doc-by-doc; safety timeout so Phase 4 always runs
+      // Voice speaks results doc-by-doc; 12s safety timeout so follow-up always shows
       const resultSpeech =
         "आधार कार्ड — बिल्कुल ठीक है। " +
         "खतौनी में एक समस्या है — नाम में अंतर है। रमेश कुमा लिखा है, जबकि आधार में रमेश कुमार है। " +
@@ -458,7 +427,6 @@ function verifyDocs() {
         "यह नाम की गलती तहसील ऑफिस में मुफ़्त में ठीक होती है, बस सात दिन लगते हैं।";
 
       speakThen(resultSpeech, () => {
-        // Phase 4: Follow-up
         setTimeout(() => {
           addAI("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?");
           speak("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?", () => setMic('idle'));
@@ -589,14 +557,14 @@ function processUserTurn(said) {
 }
 
 function triggerDocFlow() {
-  if (turn < 3) turn = 4;
+  if (turn <= 3) turn = 4;
   showTyping();
   setMic('loading');
   setTimeout(() => {
     hideTyping();
     addAI(SC.docs);
-    showDocCard();
-    speak(SC.docs, () => setMic('idle'));
+    // After AI finishes speaking about the 3 docs, auto-start scan — no manual upload needed
+    speakThen(SC.docs, startDocScan, 9000);
   }, 700);
 }
 
