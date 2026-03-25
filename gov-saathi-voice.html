@@ -887,26 +887,29 @@ function triggerNaamFix() {
 function startFormFlow() {
   document.querySelectorAll('.apply-btn-p,.apply-btn-s').forEach(b => b.disabled = true);
 
-  // Step 1 — AI confirms what's about to happen, speaks it, THEN redirects
-  addAI("ज़रूर! अभी मैं आपको <strong>PM Kisan की आधिकारिक सरकारी वेबसाइट</strong> पर ले जाता हूँ। वहाँ मैंने आपकी जानकारी के हिसाब से सभी खाने पहले से भर दिए हैं — मैं आवाज़ से एक-एक करके समझाऊँगा।");
+  // Beat 1 — full announcement, wait for speech to truly finish
+  addAI("ज़रूर! मैं आपको अभी <strong>PM Kisan की आधिकारिक सरकारी वेबसाइट</strong> पर ले जाता हूँ।<br><br>आपने जो जानकारी दी — उससे मैंने सभी ज़रूरी खाने पहले से भर दिए हैं। हम साथ में एक-एक खाना देखेंगे — मैं बताऊँगा कि क्या भरा है और क्यों।");
 
-  speakThen(
-    "ज़रूर! अभी मैं आपको PM Kisan की आधिकारिक सरकारी वेबसाइट पर ले जाता हूँ। वहाँ सभी खाने पहले से भरे हुए हैं — मैं आवाज़ से एक-एक करके समझाऊँगा कि हर खाने में क्या भरा है और क्यों।",
+  speak(
+    "ज़रूर! मैं आपको अभी PM Kisan की आधिकारिक सरकारी वेबसाइट पर ले जाता हूँ। आपने जो जानकारी दी थी — उससे मैंने सभी ज़रूरी खाने पहले से भर दिए हैं। हम साथ में एक-एक खाना देखेंगे और मैं बताऊँगा कि क्या भरा है और क्यों।",
     () => {
-      // Step 2 — site loader
-      const loader = document.createElement('div');
-      loader.className = 'site-loader';
-      loader.innerHTML = `<div class="sl-ico">🌐</div>
-        <div class="sl-title">pmkisan.gov.in खुल रहा है...</div>
-        <div class="sl-sub">Official Government of India Website</div>
-        <div class="sl-bar"><div class="sl-fill"></div></div>`;
-      $conv.appendChild(loader); scrollDown();
-
+      // Beat 2 — 700ms pause, then show loader (feels like actual redirect)
       setTimeout(() => {
-        loader.remove();
-        showFormSimulator();
-      }, 2000);
-    }, 10000
+        const loader = document.createElement('div');
+        loader.className = 'site-loader';
+        loader.innerHTML = `<div class="sl-ico">🌐</div>
+          <div class="sl-title">pmkisan.gov.in खुल रहा है...</div>
+          <div class="sl-sub">Official Government of India Website</div>
+          <div class="sl-bar"><div class="sl-fill"></div></div>`;
+        $conv.appendChild(loader); scrollDown();
+
+        // Beat 3 — 3.5s loader so user clearly sees the redirect happening
+        setTimeout(() => {
+          loader.remove();
+          showFormSimulator();
+        }, 3500);
+      }, 700);
+    }
   );
 }
 
@@ -960,7 +963,7 @@ function showFormSimulator() {
     </div>`;
 
   document.querySelector('.phone-frame').appendChild(ov);
-  setTimeout(() => voiceGuideField(0), 500);
+  setTimeout(() => voiceGuideField(0), 1500);
 }
 
 function voiceGuideField(idx) {
