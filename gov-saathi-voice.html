@@ -127,6 +127,27 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#d4d4d4;display:f
   padding:11px;font-size:13px;font-weight:700;font-family:'JioType',sans-serif;cursor:pointer;}
 .doc-verify:disabled{opacity:.38;cursor:default;}
 
+/* ════════ SCAN ANIMATION ════════ */
+.scan-card{border-radius:14px;border:1px solid var(--stroke);padding:14px 16px;background:#fff;animation:bUp 300ms ease-out;width:100%;}
+.scan-step{display:flex;align-items:center;gap:10px;padding:5px 0;}
+.scan-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.scan-dot.pending{background:#e0e0e0;}
+.scan-dot.active{background:var(--blue);animation:tdA 1.2s infinite;}
+.scan-dot.done{background:var(--green);}
+.scan-label{font-size:13px;color:var(--text);font-weight:500;}
+.scan-label.pending{color:var(--text2);}
+
+/* ════════ RESULT CHECKLIST ════════ */
+.result-cl{border-radius:14px;border:1px solid var(--stroke);overflow:hidden;animation:bUp 380ms ease-out;width:100%;}
+.rcl-hd{background:var(--blue);color:#fff;padding:10px 14px;font-size:13px;font-weight:700;}
+.rcl-row{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border-bottom:1px solid var(--stroke);background:#fff;}
+.rcl-row:last-child{border-bottom:none;}
+.rcl-row.warn{background:#fffbf0;}
+.rcl-ico{font-size:18px;flex-shrink:0;margin-top:1px;}
+.rcl-name{font-size:13px;font-weight:700;color:var(--text);}
+.rcl-msg{font-size:12px;margin-top:2px;color:var(--text2);}
+.rcl-row.warn .rcl-msg{color:var(--orange);}
+
 /* ════════ MIC BAR ════════ */
 .mic-bar{flex-shrink:0;padding:8px 24px 20px;background:#fff;
   display:flex;flex-direction:column;align-items:center;gap:5px;
@@ -401,14 +422,100 @@ function tapDoc(id) {
 }
 
 function verifyDocs() {
-  addUser("Verify karo");
-  showTyping();
-  setMic('loading');
-  setTimeout(() => {
-    hideTyping();
-    addAI('✅ आधार — बिल्कुल ठीक<br>⚠️ खतौनी — नाम में अंतर: <strong>"Ramesh Kuma"</strong> vs <strong>"Ramesh Kumar"</strong><br>✅ बैंक पासबुक — ठीक है');
-    speak("आपके दो दस्तावेज़ बिल्कुल ठीक हैं। लेकिन ज़मीन के रिकॉर्ड में नाम में थोड़ा अंतर है। रमेश कुमा लिखा हुआ है, जबकि आधार में रमेश कुमार है। यह एक छोटी सी बात है — तहसील ऑफिस में मुफ़्त में ठीक हो जाता है, सिर्फ़ सात से दस दिन में। बाकी सब बिल्कुल तैयार है!", () => setMic('idle'));
-  }, 2200);
+  // Phase 1: User message + fade doc card
+  addUser("वेरीफाई करो");
+  const docCard = $conv.querySelector('.doc-card');
+  if (docCard) docCard.style.opacity = '0.5';
+
+  // Speak "checking now", then run scan animation
+  speak("ठीक है, अभी जाँच करता हूँ...", () => {
+    // Phase 2: Scan card with animated dots
+    const scanCard = buildScanCard();
+    $conv.appendChild(scanCard);
+    scrollDown();
+
+    animateScan(scanCard, () => {
+      // Phase 3: Results checklist card
+      const cl = buildResultChecklist();
+      $conv.appendChild(cl);
+      scrollDown();
+
+      // Speak results doc-by-doc in Devanagari
+      const resultSpeech =
+        "आधार कार्ड — बिल्कुल ठीक है। " +
+        "खतौनी में एक समस्या है — नाम में अंतर है। रमेश कुमा लिखा है, जबकि आधार में रमेश कुमार है। " +
+        "बैंक पासबुक — ठीक है। " +
+        "यह नाम की गलती तहसील ऑफिस में मुफ़्त में ठीक होती है, बस सात दिन लगते हैं।";
+
+      speak(resultSpeech, () => {
+        // Phase 4: Follow-up prompt
+        setTimeout(() => {
+          addAI("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?");
+          speak("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?", () => setMic('idle'));
+        }, 500);
+      });
+    });
+  });
+}
+
+function buildScanCard() {
+  const docs = [
+    'आधार कार्ड जाँच रहा हूँ...',
+    'खतौनी जाँच रहा हूँ...',
+    'बैंक पासबुक जाँच रहा हूँ...'
+  ];
+  const card = document.createElement('div');
+  card.className = 'scan-card';
+  card.id = 'scanCard';
+  card.innerHTML = docs.map((label, i) => `
+    <div class="scan-step">
+      <div class="scan-dot ${i === 0 ? 'active' : 'pending'}" id="sdot-${i}"></div>
+      <span class="scan-label ${i === 0 ? '' : 'pending'}" id="slbl-${i}">${label}</span>
+    </div>
+  `).join('');
+  return card;
+}
+
+function animateScan(card, onDone) {
+  // dot 0 starts active; every 800ms mark it done and activate next
+  let idx = 1;
+  function step() {
+    document.getElementById('sdot-' + (idx - 1)).className = 'scan-dot done';
+    document.getElementById('slbl-' + (idx - 1)).className = 'scan-label';
+    if (idx < 3) {
+      document.getElementById('sdot-' + idx).className = 'scan-dot active';
+      document.getElementById('slbl-' + idx).className = 'scan-label';
+      idx++;
+      setTimeout(step, 800);
+    } else {
+      // All three done — remove card then call onDone
+      setTimeout(() => { card.remove(); onDone(); }, 400);
+    }
+  }
+  setTimeout(step, 800);
+}
+
+function buildResultChecklist() {
+  const cl = document.createElement('div');
+  cl.className = 'result-cl';
+  cl.innerHTML = `
+    <div class="rcl-hd">📋 PM Kisan — दस्तावेज़ जाँच</div>
+    <div class="rcl-row">
+      <span class="rcl-ico">✅</span>
+      <div><div class="rcl-name">आधार कार्ड</div><div class="rcl-msg">बिल्कुल ठीक है</div></div>
+    </div>
+    <div class="rcl-row warn">
+      <span class="rcl-ico">⚠️</span>
+      <div>
+        <div class="rcl-name">खतौनी</div>
+        <div class="rcl-msg">नाम में अंतर: "Ramesh Kuma" vs "Ramesh Kumar"</div>
+      </div>
+    </div>
+    <div class="rcl-row">
+      <span class="rcl-ico">✅</span>
+      <div><div class="rcl-name">बैंक पासबुक</div><div class="rcl-msg">बिल्कुल ठीक है</div></div>
+    </div>`;
+  return cl;
 }
 
 // ══════════════════════════════════════
