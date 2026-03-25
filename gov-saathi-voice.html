@@ -421,15 +421,25 @@ function tapDoc(id) {
   }
 }
 
+// speakThen: like speak() but guarantees onDone fires even if TTS callback stalls
+function speakThen(text, onDone, timeoutMs) {
+  let fired = false;
+  function finish() { if (!fired) { fired = true; onDone?.(); } }
+  speak(text, finish);
+  setTimeout(finish, timeoutMs || 10000);
+}
+
 function verifyDocs() {
   // Phase 1: User message + fade doc card
   addUser("वेरीफाई करो");
   const docCard = $conv.querySelector('.doc-card');
   if (docCard) docCard.style.opacity = '0.5';
 
-  // Speak "checking now", then run scan animation
-  speak("ठीक है, अभी जाँच करता हूँ...", () => {
-    // Phase 2: Scan card with animated dots
+  // Fire "checking" speech — visuals DON'T wait for it (decoupled)
+  speak("ठीक है, अभी जाँच करता हूँ...", null);
+
+  // Phase 2: Scan card appears after short delay regardless of speech state
+  setTimeout(() => {
     const scanCard = buildScanCard();
     $conv.appendChild(scanCard);
     scrollDown();
@@ -440,22 +450,22 @@ function verifyDocs() {
       $conv.appendChild(cl);
       scrollDown();
 
-      // Speak results doc-by-doc in Devanagari
+      // Speak results doc-by-doc; safety timeout so Phase 4 always runs
       const resultSpeech =
         "आधार कार्ड — बिल्कुल ठीक है। " +
         "खतौनी में एक समस्या है — नाम में अंतर है। रमेश कुमा लिखा है, जबकि आधार में रमेश कुमार है। " +
         "बैंक पासबुक — ठीक है। " +
         "यह नाम की गलती तहसील ऑफिस में मुफ़्त में ठीक होती है, बस सात दिन लगते हैं।";
 
-      speak(resultSpeech, () => {
-        // Phase 4: Follow-up prompt
+      speakThen(resultSpeech, () => {
+        // Phase 4: Follow-up
         setTimeout(() => {
           addAI("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?");
           speak("क्या मैं बताऊँ कि यह नाम कैसे ठीक होगा?", () => setMic('idle'));
         }, 500);
-      });
+      }, 12000);
     });
-  });
+  }, 500);
 }
 
 function buildScanCard() {
