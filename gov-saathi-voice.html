@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>Sarkar Saathi — Awaaz</title>
+<title>Nagrik AI — Awaaz</title>
 <style>
 @font-face{font-family:'JioType';font-weight:400;src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeVarW05-Regular.woff2') format('woff2');}
 @font-face{font-family:'JioType';font-weight:500;src:url('https://raw.githubusercontent.com/sunit1986/JioBharatIQ_Server/main/assets/fonts/woff2/JioTypeW05-Medium.woff2') format('woff2');}
@@ -27,13 +27,31 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#d4d4d4;display:f
 /* ════════ LANDING ════════ */
 .landing{position:absolute;inset:0;z-index:500;
   background:linear-gradient(168deg,#000c1e 0%,#001a40 35%,#003580 70%,#1a4fa8 100%);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;}
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:28px 20px 24px;overflow-y:auto;}
 .landing.exit{animation:lExit 360ms ease-in forwards;pointer-events:none;}
 @keyframes lExit{to{opacity:0;transform:translateY(-28px) scale(.97)}}
 
-.ld-logo{font-size:54px;margin-bottom:14px;filter:drop-shadow(0 6px 24px rgba(0,0,0,.5));}
-.ld-name{font-size:36px;font-weight:900;color:#fff;letter-spacing:-.035em;margin-bottom:5px;}
-.ld-tag{font-size:13px;color:rgba(255,255,255,.55);font-weight:500;text-align:center;line-height:1.7;margin-bottom:64px;}
+.ld-logo{font-size:38px;margin-bottom:8px;filter:drop-shadow(0 4px 16px rgba(0,0,0,.5));}
+.ld-name{font-size:28px;font-weight:900;color:#fff;letter-spacing:-.035em;margin-bottom:5px;}
+.ld-tag{font-size:13px;color:rgba(255,255,255,.55);font-weight:500;text-align:center;line-height:1.7;margin-bottom:20px;}
+
+/* Services grid */
+.ld-svc-section{width:100%;margin-bottom:20px;}
+.ld-svc-title{font-size:11px;font-weight:700;color:rgba(255,255,255,.5);
+  text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;}
+.ld-svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.svc-chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  border-radius:12px;padding:12px 6px 10px;display:flex;flex-direction:column;
+  align-items:center;gap:5px;cursor:pointer;transition:background 150ms,transform 100ms;}
+.svc-chip:active{background:rgba(255,255,255,.22);transform:scale(.96);}
+.svc-ico{font-size:22px;}
+.svc-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.88);text-align:center;line-height:1.3;}
+
+/* Or divider */
+.ld-or{font-size:12px;color:rgba(255,255,255,.4);margin:4px 0 16px;
+  display:flex;align-items:center;gap:10px;width:100%;}
+.ld-or::before,.ld-or::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.15);}
 
 .orb-wrap{position:relative;width:130px;height:130px;display:flex;align-items:center;justify-content:center;margin-bottom:28px;}
 .orb-ring{position:absolute;border-radius:50%;border:2px solid rgba(255,255,255,.2);pointer-events:none;}
@@ -184,8 +202,23 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#d4d4d4;display:f
 <!-- LANDING -->
 <div class="landing" id="landing">
   <div class="ld-logo">🏛️</div>
-  <div class="ld-name">Sarkar Saathi</div>
-  <div class="ld-tag">Sarkari yojana ki jaankari<br>Hindi mein, awaaz se</div>
+  <div class="ld-name">Nagrik AI</div>
+  <div class="ld-tag">Sarkari yojana · Documents · Forms<br>Hindi mein, awaaz se</div>
+
+  <div class="ld-svc-section">
+    <div class="ld-svc-title">Popular Services</div>
+    <div class="ld-svc-grid">
+      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🪪</span><span class="svc-name">Aadhaar Card</span></div>
+      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🛂</span><span class="svc-name">Passport</span></div>
+      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">💳</span><span class="svc-name">PAN Card</span></div>
+      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🌾</span><span class="svc-name">PM Kisan</span></div>
+      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🏥</span><span class="svc-name">Ayushman Bharat</span></div>
+      <div class="svc-chip" onclick="startConv()"><span class="svc-ico">🏠</span><span class="svc-name">PM Awas</span></div>
+    </div>
+  </div>
+
+  <div class="ld-or">या सीधे बात करो</div>
+
   <div class="orb-wrap">
     <div class="orb-ring orb-ring-1"></div>
     <div class="orb-ring orb-ring-2"></div>
@@ -207,7 +240,7 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#d4d4d4;display:f
     <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
   </button>
   <div class="v-hdr-info">
-    <div class="v-hdr-name">Sarkar Saathi</div>
+    <div class="v-hdr-name">Nagrik AI</div>
     <div class="v-hdr-sub">AI Government Guide · Hindi</div>
   </div>
   <span class="v-badge">हिंदी</span>
@@ -257,7 +290,7 @@ let docUploaded  = {};
 
 // ── Conversation script (Devanagari — gives Sarvam authentic Indian accent) ──
 const SC = {
-  greet:   "नमस्ते! मैं सरकार साथी हूँ — आपका सरकारी योजना में मदद करने वाला AI साथी। बताइए, क्या मदद चाहिए?",
+  greet:   "नमस्ते! मैं नागरिक AI हूँ — आपका सरकारी योजना में मदद करने वाला AI साथी। बताइए, क्या मदद चाहिए?",
   ack0:    "ज़रूर! पहले मुझे थोड़ी सी जानकारी चाहिए।",
   q1:      "पहला सवाल — आप क्या काम करते हैं? खेती करते हैं, या कोई नौकरी, या कुछ और?",
   ack1:    "अच्छा, आप किसान हैं। बहुत अच्छा।",
@@ -337,7 +370,7 @@ function setMic(state) {
   const S = {
     idle:     { bg:'var(--blue)', rings:false, status:'टैप करके बात करो',     hint:'🎙️ आप बात कर सकते हैं' },
     listening:{ bg:'#e53935',    rings:true,  status:'🔴  सुन रहा हूँ...',     hint:'बोलिए, मैं सुन रहा हूँ' },
-    speaking: { bg:'var(--blue)', rings:false, status:'🔊  बोल रहा हूँ...',    hint:'सरकार साथी बोल रहा है' },
+    speaking: { bg:'var(--blue)', rings:false, status:'🔊  बोल रहा हूँ...',    hint:'नागरिक AI बोल रहा है' },
     loading:  { bg:'#6b7280',    rings:false, status:'⏳  ढूंढ रहा हूँ...',    hint:'एक सेकंड...' },
   };
   const s = S[state] || S.idle;
@@ -447,6 +480,7 @@ function tapDoc(id) {
     if (docUploaded.d0 && docUploaded.d1 && docUploaded.d2) {
       const v = document.getElementById('verifyBtn');
       v.disabled = false;
+      scrollDown();
     }
   }, 600);
 }
