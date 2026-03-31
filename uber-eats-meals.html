@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Uber Eats — Packaged Meals Prototype</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        uber: { green: '#06B479', dark: '#142328', black: '#000000' },
+        plan: { dark: '#064E3B', light: '#F0FDF4', mid: '#D1FAE5' },
+        ann: { purple: '#7C3AED', bg: '#EDE9FE' },
+      },
+      fontFamily: { sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Segoe UI', 'sans-serif'] },
+    }
+  }
+}
+</script>
+<style>
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+body { margin: 0; background: #1a1a2e; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif; }
+.phone-frame { width: 375px; height: 812px; background: #fff; border-radius: 44px; overflow: hidden; position: relative; box-shadow: 0 0 0 12px #1a1a1a, 0 0 0 14px #333, 0 25px 60px rgba(0,0,0,0.5); }
+.phone-screen { width: 100%; height: 100%; overflow-y: auto; overflow-x: hidden; position: relative; scroll-behavior: smooth; padding-bottom: 70px; }
+.phone-screen::-webkit-scrollbar { display: none; }
+.notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 150px; height: 34px; background: #1a1a1a; border-radius: 0 0 20px 20px; z-index: 50; }
+.status-bar { height: 54px; padding: 14px 24px 0; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600; position: relative; z-index: 40; }
+.slide-enter { animation: slideIn 250ms ease-out; }
+.slide-exit { animation: slideOut 200ms ease-in; }
+@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-30%); opacity: 0; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popIn { 0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes bounceCheck { 0% { transform: scale(0); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+@keyframes bigBounce { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+.fade-in { animation: fadeIn 300ms ease-out; }
+.pop-in { animation: popIn 300ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.slide-up { animation: slideUp 350ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.bounce-in { animation: bigBounce 500ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes dotPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.7; } }
+.shimmer-tab { background: linear-gradient(90deg, transparent 0%, transparent 35%, rgba(6,78,59,0.15) 45%, rgba(6,78,59,0.22) 50%, rgba(6,78,59,0.15) 55%, transparent 65%, transparent 100%); background-size: 200% 100%; animation: shimmer 2.5s ease-in-out infinite; animation-delay: 1s; }
+.dot-pulse { animation: dotPulse 2s ease-in-out infinite; }
+.meal-card { transition: all 150ms ease; }
+.meal-card:active { transform: scale(0.97); }
+.ann-badge { font-size: 10px; line-height: 1.3; max-width: 200px; }
+input[type="checkbox"] { display: none; }
+.toggle-track { width: 44px; height: 26px; border-radius: 13px; background: #E5E7EB; position: relative; cursor: pointer; transition: background 200ms; }
+.toggle-track.on { background: #06B479; }
+.toggle-knob { width: 22px; height: 22px; border-radius: 11px; background: white; position: absolute; top: 2px; left: 2px; transition: transform 200ms; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle-track.on .toggle-knob { transform: translateX(18px); }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useContext, createContext, useEffect, useRef, useCallback } = React;
+
+// ─── DATA ─────────────────────────────────────────────────────────────────────
+
+const RESTAURANTS = [
+  { id: 'r1', name: "McDonald's®", rating: 4.6, reviews: '4,000+', time: '14 min', fee: 'Low Delivery Fee', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop', promo: 'US$5 off US$20+', badge: 'Great value' },
+  { id: 'r2', name: 'Starbucks', rating: 4.5, reviews: '150+', time: '20 min', fee: 'Low Delivery Fee', img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=300&fit=crop' },
+  { id: 'r3', name: 'Burger King', rating: 4.5, reviews: '3,000+', time: '18 min', fee: 'Low Delivery Fee', img: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=300&fit=crop', promo: 'Buy 1, get 1', badge: '#8 Fave' },
+  { id: 'r4', name: 'Angel Cafe & Deli', rating: 4.8, reviews: '470+', time: '13 min', fee: 'Low Delivery Fee', img: 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&h=300&fit=crop' },
+  { id: 'r5', name: 'Cafe Guatemala', rating: 4.7, reviews: '320+', time: '15 min', fee: 'Low Delivery Fee', img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop', badge: 'Best Overall' },
+  { id: 'r6', name: 'The Deli Lama', rating: 5.0, reviews: '40', time: '35 min', fee: 'Moderate Delivery Fee', img: 'https://images.unsplash.com/photo-1539252554453-80ab65ce3586?w=400&h=300&fit=crop' },
+  { id: 'r7', name: 'Pizza Roma', rating: 4.5, reviews: '4.2k+', time: '20-30 min', fee: 'Low Delivery Fee', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop', promo: '$0 delivery' },
+  { id: 'r8', name: 'Taco Street', rating: 4.4, reviews: '1.5k+', time: '15-20 min', fee: 'Low Delivery Fee', img: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop' },
+];
+
+const RESTAURANT_SECTIONS = [
+  { title: 'Featured on Uber Eats', ids: ['r1', 'r2'] },
+  { title: 'Low Delivery Fee options', ids: ['r4', 'r3'] },
+  { title: 'Popular in your area', ids: ['r4', 'r5'] },
+  { title: 'National favourites', ids: ['r1', 'r7'] },
+];
+
+const CREATORS = [
+  { id: 'c1', name: 'Baan Thai Kitchen', tagline: 'Authentic Thai meals, made fresh daily', location: 'San Francisco', rating: 4.8, reviews: 234, certs: ['Commercial Kitchen', 'HACCP Certified'], about: 'Chef Narin brings 20 years of Bangkok street food experience to perfectly portioned weekly meals. Every dish uses authentic Thai ingredients sourced from local Asian markets.' },
+  { id: 'c2', name: 'Green & Grain Co.', tagline: 'Plant-forward meals for busy people', location: 'San Francisco', rating: 4.9, reviews: 312, certs: ['Commercial Kitchen', 'Organic', 'HACCP Certified'], about: 'Founded by two nutritionists who believe healthy eating shouldn\'t require a PhD. Seasonal menus rotate monthly with locally sourced organic produce.' },
+  { id: 'c3', name: 'Seoul Kitchen', tagline: 'Korean comfort, perfectly portioned', location: 'San Francisco', rating: 4.7, reviews: 189, certs: ['Commercial Kitchen', 'HACCP Certified'], about: 'Traditional Korean recipes adapted for the modern kitchen. Each meal is crafted to bring the warmth of Korean home cooking to your weekly rotation.' },
+  { id: 'c4', name: 'Coastal Eats', tagline: 'Sustainable seafood, chef-crafted', location: 'San Francisco', rating: 4.8, reviews: 156, certs: ['Commercial Kitchen', 'Sustainable Seafood', 'HACCP Certified'], about: 'Partnered with local fisheries for the freshest, sustainably caught seafood. Chef Marcus brings fine-dining technique to everyday meals.' },
+  { id: 'c5', name: 'Spice Route Meals', tagline: 'Global flavors, local ingredients', location: 'San Francisco', rating: 4.6, reviews: 98, certs: ['Commercial Kitchen', 'HACCP Certified'], about: 'A culinary tour through South Asia, the Middle East, and beyond. Each meal is a passport stamp — bold, aromatic, and deeply satisfying.' },
+];
+
+const MEALS = [
+  { id: 'm1', name: 'Thai Basil Chicken Bowl', creatorId: 'c1', price: 11.99, cal: 520, protein: 38, carbs: 52, fat: 14, tags: ['High Protein', 'Gluten Free'], img: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400&h=300&fit=crop', ingredients: 'Chicken thigh, Thai basil, jasmine rice, bell peppers, fish sauce, garlic, chili', reheatMicro: 'Remove lid, heat 3 min', reheatOven: '375°F, transfer to oven-safe dish, 12 min', allergens: ['Soy', 'Fish'] },
+  { id: 'm2', name: 'Mediterranean Quinoa Salad', creatorId: 'c2', price: 9.99, cal: 380, protein: 14, carbs: 48, fat: 16, tags: ['Vegan', 'Low Cal'], img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop', ingredients: 'Quinoa, cucumber, cherry tomatoes, kalamata olives, red onion, lemon-herb vinaigrette', reheatMicro: 'Best served cold or room temp', reheatOven: 'N/A — cold dish', allergens: [] },
+  { id: 'm3', name: 'Korean BBQ Beef & Rice', creatorId: 'c3', price: 12.99, cal: 610, protein: 42, carbs: 58, fat: 18, tags: ['High Protein'], img: 'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&h=300&fit=crop', ingredients: 'Beef bulgogi, steamed rice, pickled radish, sesame spinach, gochujang sauce', reheatMicro: 'Remove lid, heat 3.5 min', reheatOven: '375°F, 15 min', allergens: ['Soy', 'Sesame'] },
+  { id: 'm4', name: 'Lemon Herb Salmon', creatorId: 'c4', price: 13.99, cal: 440, protein: 36, carbs: 28, fat: 22, tags: ['Keto', 'Gluten Free'], img: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop', ingredients: 'Atlantic salmon, roasted asparagus, cauliflower mash, lemon-dill sauce', reheatMicro: 'Remove lid, heat 2.5 min', reheatOven: '350°F, 10 min', allergens: ['Fish'] },
+  { id: 'm5', name: 'Chickpea Tikka Masala', creatorId: 'c5', price: 10.99, cal: 460, protein: 18, carbs: 56, fat: 16, tags: ['Vegan', 'High Fiber'], img: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&h=300&fit=crop', ingredients: 'Chickpeas, tomato-cream sauce, basmati rice, cilantro, warming spices', reheatMicro: 'Remove lid, heat 3 min', reheatOven: '375°F, 12 min', allergens: [] },
+  { id: 'm6', name: 'Grilled Chicken Caesar', creatorId: 'c2', price: 10.49, cal: 490, protein: 40, carbs: 24, fat: 26, tags: ['High Protein', 'Low Carb'], img: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop', ingredients: 'Grilled chicken breast, romaine, parmesan, croutons, Caesar dressing', reheatMicro: 'Heat chicken 2 min, serve over cold greens', reheatOven: 'Heat chicken at 350°F 8 min', allergens: ['Dairy', 'Gluten'] },
+  { id: 'm7', name: 'Teriyaki Tofu Stir-Fry', creatorId: 'c1', price: 9.49, cal: 350, protein: 22, carbs: 42, fat: 10, tags: ['Vegan', 'Low Cal'], img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop', ingredients: 'Firm tofu, broccoli, snap peas, brown rice, house teriyaki glaze', reheatMicro: 'Remove lid, heat 3 min', reheatOven: '375°F, 12 min', allergens: ['Soy'] },
+  { id: 'm8', name: 'BBQ Pulled Pork Mac', creatorId: 'c3', price: 11.49, cal: 720, protein: 38, carbs: 62, fat: 32, tags: ['High Protein'], img: 'https://images.unsplash.com/photo-1543339494-b4cd4f7ba686?w=400&h=300&fit=crop', ingredients: 'Slow-smoked pulled pork, elbow pasta, three-cheese sauce, BBQ drizzle', reheatMicro: 'Remove lid, heat 3.5 min, stir halfway', reheatOven: '375°F, 15 min', allergens: ['Dairy', 'Gluten'] },
+  { id: 'm9', name: 'Harvest Grain Power Bowl', creatorId: 'c2', price: 10.49, cal: 410, protein: 16, carbs: 58, fat: 14, tags: ['Vegan', 'High Fiber'], img: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop', ingredients: 'Farro, roasted sweet potato, kale, tahini dressing, pumpkin seeds', reheatMicro: 'Remove lid, heat 2.5 min', reheatOven: '375°F, 10 min', allergens: ['Sesame'] },
+  { id: 'm10', name: 'Mango Chicken Curry', creatorId: 'c5', price: 11.49, cal: 530, protein: 34, carbs: 54, fat: 18, tags: ['Gluten Free'], img: 'https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=400&h=300&fit=crop', ingredients: 'Chicken breast, mango-coconut curry sauce, jasmine rice, fresh cilantro', reheatMicro: 'Remove lid, heat 3 min', reheatOven: '375°F, 12 min', allergens: [] },
+];
+
+const RESTAURANT_DISHES = [
+  { id: 'rd1', name: 'Margherita Pizza', from: 'Pizza Roma', price: 14.99, time: '25 min', img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop', cal: 680, tags: [] },
+  { id: 'rd2', name: 'Classic Smash Burger', from: "McDonald's\u00AE", price: 9.99, time: '14 min', img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop', cal: 750, tags: [] },
+  { id: 'rd3', name: 'Chicken Burrito Bowl', from: 'Taco Street', price: 11.49, time: '18 min', img: 'https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop', cal: 620, tags: [] },
+  { id: 'rd4', name: 'Caramel Frappuccino', from: 'Starbucks', price: 5.99, time: '12 min', img: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=300&fit=crop', cal: 250, tags: [] },
+  { id: 'rd5', name: 'Croissant & Latte', from: 'Angel Cafe & Deli', price: 8.49, time: '13 min', img: 'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400&h=300&fit=crop', cal: 420, tags: [] },
+];
+
+const PLAN_DATES = ['Mar 31', 'Apr 1', 'Apr 2', 'Apr 3', 'Apr 4'];
+
+// Hot meal menus for restaurant detail screens
+const RESTAURANT_MENUS = {
+  'r1': [ // McDonald's
+    { id: 'h1', name: 'Big Mac Combo', price: 12.99, cal: 750, img: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop', desc: 'Big Mac, medium fries, medium drink' },
+    { id: 'h2', name: 'McChicken Sandwich', price: 7.49, cal: 420, img: 'https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400&h=300&fit=crop', desc: 'Crispy chicken, mayo, shredded lettuce' },
+    { id: 'h3', name: '10pc Chicken McNuggets', price: 8.99, cal: 480, img: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&h=300&fit=crop', desc: 'Golden nuggets with dipping sauce' },
+    { id: 'h4', name: 'Quarter Pounder w/ Cheese', price: 10.49, cal: 630, img: 'https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=300&fit=crop', desc: 'Fresh beef, American cheese, pickles' },
+  ],
+  'r4': [ // Angel Cafe & Deli
+    { id: 'h5', name: 'Avocado Toast & Eggs', price: 14.99, cal: 520, img: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=400&h=300&fit=crop', desc: 'Sourdough, smashed avo, two poached eggs' },
+    { id: 'h6', name: 'Açaí Bowl', price: 12.99, cal: 380, img: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=400&h=300&fit=crop', desc: 'Açaí blend, granola, banana, berries' },
+    { id: 'h7', name: 'Grilled Chicken Wrap', price: 13.49, cal: 560, img: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&h=300&fit=crop', desc: 'Grilled chicken, greens, pesto aioli' },
+    { id: 'h8', name: 'Banana Pancake Stack', price: 11.99, cal: 620, img: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop', desc: 'Fluffy pancakes, banana, maple syrup' },
+  ],
+  'r7': [ // Pizza Roma
+    { id: 'h9', name: 'Margherita Pizza', price: 14.99, cal: 680, img: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop', desc: 'San Marzano, fresh mozzarella, basil' },
+    { id: 'h10', name: 'Pepperoni Pizza', price: 16.99, cal: 780, img: 'https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&h=300&fit=crop', desc: 'Classic pepperoni, mozzarella, oregano' },
+    { id: 'h11', name: 'Garlic Knots (6pc)', price: 6.99, cal: 340, img: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=300&fit=crop', desc: 'Garlic butter, parmesan, parsley' },
+    { id: 'h12', name: 'Caesar Salad', price: 9.99, cal: 290, img: 'https://images.unsplash.com/photo-1546793665-c74683f339c1?w=400&h=300&fit=crop', desc: 'Romaine, croutons, parmesan, caesar' },
+  ],
+  'r5': [ // Cafe Guatemala
+    { id: 'h13', name: 'Breakfast Burrito', price: 11.99, cal: 650, img: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=400&h=300&fit=crop', desc: 'Eggs, beans, cheese, salsa verde' },
+    { id: 'h14', name: 'Cold Brew & Pastry', price: 8.49, cal: 320, img: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop', desc: 'House cold brew, fresh pastry of the day' },
+    { id: 'h15', name: 'Huevos Rancheros', price: 13.99, cal: 580, img: 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&h=300&fit=crop', desc: 'Fried eggs, black beans, tortilla, salsa' },
+    { id: 'h16', name: 'Churros & Chocolate', price: 7.99, cal: 420, img: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop', desc: 'Fresh churros, warm chocolate dip' },
+  ],
+};
+// Fallback menu for restaurants without custom menus
+const DEFAULT_MENU = [
+  { id: 'hd1', name: 'House Special', price: 13.99, cal: 580, img: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop', desc: 'Chef\'s daily special' },
+  { id: 'hd2', name: 'Classic Combo', price: 11.49, cal: 520, img: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop', desc: 'Popular combo meal' },
+  { id: 'hd3', name: 'Side Salad', price: 6.99, cal: 180, img: 'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400&h=300&fit=crop', desc: 'Fresh garden salad' },
+];
+
+const CATEGORIES = [
+  { emoji: '🍽️', label: 'Dine out' },
+  { emoji: '🥞', label: 'Breakfast' },
+  { emoji: '☕', label: 'Coffee' },
+  { emoji: '🐣', label: 'Easter' },
+  { emoji: '🍕', label: 'Pizza' },
+  { emoji: '🍔', label: 'Burgers' },
+  { emoji: '🍣', label: 'Sushi' },
+];
+const FILTERS = ['All', 'High Protein', 'Vegan', 'Low Cal', 'Keto', 'Gluten Free', 'High Fiber', 'Low Carb'];
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const WINDOWS = ['9:00 AM – 1:00 PM', '1:00 PM – 5:00 PM', '5:00 PM – 9:00 PM'];
+
+function getCreator(id) { return CREATORS.find(c => c.id === id); }
+function getNextDates() {
+  const d = new Date(); const dates = [];
+  for (let i = 0; i < 5; i++) { const nd = new Date(d); nd.setDate(d.getDate() + ((1 + i - d.getDay() + 7) % 7 || 7)); dates.push(nd); }
+  return dates;
+}
+const NEXT_DATES = getNextDates();
+
+// ─── CONTEXT ──────────────────────────────────────────────────────────────────
+
+const AppCtx = createContext();
+
+function AppProvider({ children }) {
+  const [screen, setScreen] = useState('tonight');
+  const [prevScreen, setPrevScreen] = useState(null);
+  const [mode, setMode] = useState('tonight');
+  const [cart, setCart] = useState([]);
+  const [uberOne, setUberOne] = useState(false);
+  const [showAnnotations, setShowAnnotations] = useState(true);
+  const [orderCount, setOrderCount] = useState(0);
+  const [nudgeDismissed, setNudgeDismissed] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [selectedWindow, setSelectedWindow] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [planStatus, setPlanStatus] = useState('none');
+  const [selectedMeal, setSelectedMeal] = useState(null);
+  const [selectedCreator, setSelectedCreator] = useState(null);
+  const [history, setHistory] = useState(['tonight']);
+  const [hasPackagedMeals, setHasPackagedMeals] = useState(false);
+  const [completedOrders, setCompletedOrders] = useState(0);
+  const [lastOrder, setLastOrder] = useState(null);
+  const [isReturningUser, setIsReturningUser] = useState(false);
+  const [lastWeekPlan, setLastWeekPlan] = useState(null);
+  const [hotCart, setHotCart] = useState([]);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null);
+
+  const navigate = useCallback((s, data) => {
+    if (data?.meal) setSelectedMeal(data.meal);
+    if (data?.creator) setSelectedCreator(data.creator);
+    if (data?.restaurant) setSelectedRestaurant(data.restaurant);
+    setPrevScreen(screen);
+    setScreen(s);
+    setHistory(h => [...h, s]);
+  }, [screen]);
+
+  const goBack = useCallback(() => {
+    setHistory(h => {
+      if (h.length <= 1) return h;
+      const newH = h.slice(0, -1);
+      setScreen(newH[newH.length - 1]);
+      return newH;
+    });
+  }, []);
+
+  const toggleMode = useCallback((m) => {
+    setMode(m);
+    setScreen(m === 'tonight' ? 'tonight' : 'thisweek');
+    setHistory([m === 'tonight' ? 'tonight' : 'thisweek']);
+  }, []);
+
+  const addToCart = useCallback((meal) => {
+    setCart(c => c.length >= 7 ? c : c.find(m => m.id === meal.id) ? c : [...c, meal]);
+  }, []);
+
+  const removeFromCart = useCallback((mealId) => {
+    setCart(c => c.filter(m => m.id !== mealId));
+  }, []);
+
+  const inCart = useCallback((mealId) => cart.some(m => m.id === mealId), [cart]);
+
+  const addToHotCart = useCallback((item) => {
+    setHotCart(c => c.find(i => i.id === item.id) ? c.map(i => i.id === item.id ? { ...i, qty: (i.qty || 1) + 1 } : i) : [...c, { ...item, qty: 1 }]);
+  }, []);
+  const removeFromHotCart = useCallback((itemId) => { setHotCart(c => c.filter(i => i.id !== itemId)); }, []);
+  const hotSubtotal = hotCart.reduce((s, i) => s + i.price * (i.qty || 1), 0);
+  const hotTotal = hotSubtotal + (hotCart.length > 0 ? 3.99 : 0);
+
+  const subtotal = cart.reduce((s, m) => s + m.price, 0);
+  const deliveryFee = uberOne ? 0 : 3.99;
+  const packaging = cart.length > 0 ? 0.50 : 0;
+  const total = subtotal + deliveryFee + packaging;
+  const savingsRate = planStatus === 'active' ? 0.15 : 0;
+
+  return (
+    <AppCtx.Provider value={{
+      screen, navigate, goBack, mode, toggleMode,
+      cart, setCart, addToCart, removeFromCart, inCart,
+      uberOne, setUberOne, showAnnotations, setShowAnnotations,
+      orderCount, setOrderCount, nudgeDismissed, setNudgeDismissed,
+      selectedDay, setSelectedDay, selectedWindow, setSelectedWindow,
+      activeFilter, setActiveFilter, planStatus, setPlanStatus,
+      selectedMeal, selectedCreator,
+      subtotal, deliveryFee, packaging, total, savingsRate,
+      history, hasPackagedMeals, setHasPackagedMeals,
+      completedOrders, setCompletedOrders,
+      lastOrder, setLastOrder,
+      isReturningUser, setIsReturningUser, lastWeekPlan, setLastWeekPlan,
+      hotCart, setHotCart, addToHotCart, removeFromHotCart, hotSubtotal, hotTotal,
+      selectedRestaurant, setSelectedRestaurant,
+    }}>
+      {children}
+    </AppCtx.Provider>
+  );
+}
+
+// ─── SHARED COMPONENTS ────────────────────────────────────────────────────────
+
+function Annotation({ text, position = 'below', className = '' }) {
+  const { showAnnotations } = useContext(AppCtx);
+  if (!showAnnotations) return null;
+  return (
+    <div className={`flex items-start gap-1.5 mt-1.5 ${className}`}>
+      <span className="shrink-0 w-4 h-4 rounded-full bg-ann-purple text-white text-[9px] flex items-center justify-center font-bold">PM</span>
+      <span className="ann-badge text-ann-purple bg-ann-bg rounded px-1.5 py-0.5 font-medium">{text}</span>
+    </div>
+  );
+}
+
+function StatusBar() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: false });
+  return (
+    <div className="status-bar bg-white">
+      <span className="text-sm font-semibold">{t}</span>
+      <div className="flex items-center gap-1">
+        <svg width="16" height="12" viewBox="0 0 16 12"><rect x="0" y="8" width="3" height="4" rx="0.5" fill="#000"/><rect x="4" y="5" width="3" height="7" rx="0.5" fill="#000"/><rect x="8" y="2" width="3" height="10" rx="0.5" fill="#000"/><rect x="12" y="0" width="3" height="12" rx="0.5" fill="#000"/></svg>
+        <svg width="16" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2.5"><path d="M5 12.55a11 11 0 0114 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>
+        <div className="flex items-center ml-0.5"><div className="w-6 h-3 border border-black rounded-sm relative"><div className="absolute left-0.5 top-0.5 bottom-0.5 w-3/4 bg-black rounded-[1px]"/></div></div>
+      </div>
+    </div>
+  );
+}
+
+function TopBar() {
+  const { uberOne, navigate } = useContext(AppCtx);
+  return (
+    <div className="px-4 pb-2">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-1.5">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#000"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg>
+          <span className="text-[15px] font-semibold">742 Evergreen Terrace</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="#000"><path d="M7 10l5 5 5-5z"/></svg>
+        </div>
+        <div className="flex items-center gap-2">
+          {uberOne && <span className="bg-[#05944F] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">One</span>}
+          <button onClick={() => navigate('notifications')} className="w-8 h-8 flex items-center justify-center">
+            <svg width="20" height="20" fill="none" stroke="#000" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9zM13.73 21a2 2 0 01-3.46 0"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ModeToggle() {
+  const { mode, toggleMode, isReturningUser } = useContext(AppCtx);
+  return (
+    <div className="mx-4 mb-3">
+      <div className="bg-gray-100 rounded-full p-[3px] flex relative">
+        <button onClick={() => toggleMode('tonight')} className={`flex-1 py-2 rounded-full text-[13px] font-semibold transition-all duration-250 z-10 ${mode === 'tonight' ? 'bg-black text-white' : 'text-gray-500'}`}>Tonight</button>
+        <button onClick={() => toggleMode('thisweek')} className={`flex-1 py-2 rounded-full text-[13px] font-semibold transition-all duration-250 z-10 relative ${mode === 'thisweek' ? 'bg-plan-dark text-white' : isReturningUser ? 'text-gray-500' : 'text-[#064E3B] shimmer-tab'}`}>
+          This week
+        </button>
+      </div>
+      <Annotation text="Mode separation, not tab pollution — core UX untouched" />
+    </div>
+  );
+}
+
+function BottomNav() {
+  const { mode, navigate, screen } = useContext(AppCtx);
+  const isHome = screen === 'tonight' || screen === 'thisweek';
+  const isOrders = screen === 'manage';
+  const isAccount = screen === 'settings';
+  const iconColor = (active) => active ? '#000' : '#9CA3AF';
+  return (
+    <div className="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex px-2 pb-5 pt-2 z-30">
+      <button onClick={() => navigate(mode === 'tonight' ? 'tonight' : 'thisweek')} className="flex-1 flex flex-col items-center gap-0.5">
+        <svg width="22" height="22" fill={isHome ? '#000' : 'none'} stroke={iconColor(isHome)} strokeWidth="2" viewBox="0 0 24 24"><path d="M3 12l9-8 9 8"/><path d="M5 10v10a1 1 0 001 1h3v-6h6v6h3a1 1 0 001-1V10"/></svg>
+        <span className={`text-[10px] font-medium ${isHome ? 'text-black' : 'text-gray-400'}`}>Home</span>
+      </button>
+      <button className="flex-1 flex flex-col items-center gap-0.5">
+        <svg width="22" height="22" fill="none" stroke="#9CA3AF" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/><path d="M17 8h4M19 6v4"/></svg>
+        <span className="text-[10px] font-medium text-gray-400">Browse</span>
+      </button>
+      <button className="flex-1 flex flex-col items-center gap-0.5">
+        <svg width="22" height="22" fill="none" stroke="#9CA3AF" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <span className="text-[10px] font-medium text-gray-400">Search</span>
+      </button>
+      <button onClick={() => navigate('manage')} className="flex-1 flex flex-col items-center gap-0.5">
+        <svg width="22" height="22" fill="none" stroke={iconColor(isOrders)} strokeWidth="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>
+        <span className={`text-[10px] font-medium ${isOrders ? 'text-black' : 'text-gray-400'}`}>Orders</span>
+      </button>
+      <button onClick={() => navigate('settings')} className="flex-1 flex flex-col items-center gap-0.5">
+        <svg width="22" height="22" fill="none" stroke={iconColor(isAccount)} strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20c0-4 3-6 7-6s7 2 7 6"/></svg>
+        <span className={`text-[10px] font-medium ${isAccount ? 'text-black' : 'text-gray-400'}`}>Account</span>
+      </button>
+    </div>
+  );
+}
+
+function BackHeader({ title, right }) {
+  const { goBack } = useContext(AppCtx);
+  return (
+    <div className="sticky top-0 bg-white z-20 px-4 pt-14 pb-3 flex items-center gap-3 border-b border-gray-50">
+      <button onClick={goBack} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100">
+        <svg width="20" height="20" fill="none" stroke="#000" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <span className="text-[16px] font-semibold flex-1">{title}</span>
+      {right}
+    </div>
+  );
+}
+
+function MealCard({ meal, compact = false }) {
+  const { inCart, addToCart, removeFromCart, navigate } = useContext(AppCtx);
+  const isIn = inCart(meal.id);
+  const creator = getCreator(meal.creatorId);
+
+  if (compact) {
+    return (
+      <div className="flex items-center gap-3 py-3 border-b border-gray-50">
+        <img src={meal.img} alt={meal.name} className="w-14 h-14 rounded-xl object-cover shrink-0" loading="lazy" />
+        <div className="flex-1 min-w-0">
+          <div className="text-[13px] font-semibold truncate">{meal.name}</div>
+          <div className="text-[11px] text-gray-500">{meal.from || creator?.name} · {meal.cal} cal</div>
+        </div>
+        <div className="text-right shrink-0">
+          <div className="text-[13px] font-bold">${meal.price.toFixed(2)}</div>
+          <button onClick={() => removeFromCart(meal.id)} className="text-[11px] text-red-500 font-medium mt-0.5">Remove</button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`meal-card rounded-2xl border-2 overflow-hidden cursor-pointer ${isIn ? 'border-uber-green shadow-sm' : 'border-gray-100'}`}
+      onClick={() => navigate('mealDetail', { meal })}>
+      <div className="relative h-[100px] overflow-hidden">
+        <img src={meal.img} alt={meal.name} className="w-full h-full object-cover" loading="lazy" />
+        {isIn && (
+          <div className="absolute top-2 right-2 w-6 h-6 bg-uber-green rounded-full flex items-center justify-center pop-in">
+            <svg width="14" height="14" fill="none" stroke="#fff" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+        )}
+      </div>
+      <div className="p-2.5">
+        <div className="text-[13px] font-semibold leading-tight line-clamp-2 h-[34px]">{meal.name}</div>
+        <div className="text-[11px] text-gray-500 mt-0.5">{creator?.name}</div>
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {meal.tags.map(t => (
+            <span key={t} className="text-[9px] font-medium bg-plan-light text-plan-dark px-1.5 py-0.5 rounded-full">{t}</span>
+          ))}
+        </div>
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-[14px] font-bold">${meal.price.toFixed(2)}</span>
+          <span className="text-[11px] text-gray-400">{meal.cal} cal</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RestaurantCard({ r, wide = false }) {
+  const { navigate } = useContext(AppCtx);
+  const w = wide ? 'w-[280px]' : 'w-[200px]';
+  return (
+    <div className={`${w} shrink-0 cursor-pointer`} onClick={() => navigate('restaurantDetail', { restaurant: r })}>
+      <div className="relative rounded-2xl overflow-hidden h-[130px]">
+        <img src={r.img} alt={r.name} className="w-full h-full object-cover" loading="lazy" />
+        {r.promo && (
+          <div className="absolute top-2 left-2 bg-[#05944F] text-white text-[11px] font-bold px-2 py-0.5 rounded-md">{r.promo}</div>
+        )}
+        <button className="absolute top-2 right-2 w-7 h-7 bg-white/80 rounded-full flex items-center justify-center" onClick={e => e.stopPropagation()}>
+          <svg width="14" height="14" fill="none" stroke="#000" strokeWidth="1.5" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </button>
+      </div>
+      <div className="mt-2 px-0.5">
+        <div className="flex items-start justify-between">
+          <div className="text-[15px] font-semibold leading-tight">{r.name}</div>
+        </div>
+        <div className="flex items-center gap-1 mt-0.5 text-[13px] text-gray-500">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#6B7280" strokeWidth="1.5"/><path d="M12 6v6h4" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round"/></svg>
+          <span>{r.fee}</span>
+          <span>·</span>
+          <span>{r.time}</span>
+        </div>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <span className="text-[13px] font-medium">{r.rating}</span>
+          <span className="text-[13px]">★</span>
+          <span className="text-[12px] text-gray-400">({r.reviews})</span>
+          {r.badge && <span className="text-[11px] font-semibold bg-[#E8F5E9] text-[#2E7D32] px-1.5 py-0.5 rounded ml-1">{r.badge}</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ProviderCard({ creator }) {
+  const { navigate } = useContext(AppCtx);
+  const cheapest = MEALS.filter(m => m.creatorId === creator.id).reduce((min, m) => Math.min(min, m.price), 99);
+  return (
+    <button onClick={() => navigate('creatorProfile', { creator })} className="shrink-0 w-[140px] border border-gray-100 rounded-2xl p-3 text-left">
+      <div className="w-12 h-12 rounded-full bg-plan-light flex items-center justify-center text-[18px] font-bold text-plan-dark">{creator.name[0]}</div>
+      <div className="text-[13px] font-semibold mt-2 leading-tight">{creator.name}</div>
+      <div className="text-[10px] text-gray-500 mt-0.5 line-clamp-2">{creator.tagline}</div>
+      <div className="text-[11px] mt-1.5">⭐ {creator.rating}</div>
+      <div className="text-[11px] text-uber-green font-semibold mt-0.5">From ${cheapest.toFixed(2)}/meal</div>
+    </button>
+  );
+}
+
+function Toggle({ on, onToggle, label }) {
+  return (
+    <div className="flex items-center justify-between py-3">
+      <span className="text-[14px] font-medium">{label}</span>
+      <div className={`toggle-track ${on ? 'on' : ''}`} onClick={onToggle}><div className="toggle-knob"/></div>
+    </div>
+  );
+}
+
+function StickyCartBar() {
+  const { cart, total, navigate } = useContext(AppCtx);
+  if (cart.length === 0) return null;
+  return (
+    <div className="sticky bottom-[72px] px-4 pb-2 z-20 slide-up">
+      <button onClick={() => navigate('weeklyBox')} className="w-full bg-uber-green text-white rounded-full py-3.5 px-5 flex items-center justify-between font-semibold text-[14px] shadow-lg">
+        <span>View weekly box · {cart.length} meal{cart.length > 1 ? 's' : ''}</span>
+        <span>${total.toFixed(2)}</span>
+      </button>
+    </div>
+  );
+}
+
+// ─── SCREEN 1: TONIGHT HOME ──────────────────────────────────────────────────
+
+function ServiceTabs() {
+  return (
+    <div className="flex gap-2 px-4 mb-3 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+      <button className="shrink-0 flex items-center gap-1.5 bg-black text-white rounded-full px-4 py-2">
+        <span className="text-[14px]">🛍️</span>
+        <span className="text-[13px] font-medium">All</span>
+      </button>
+      <button className="shrink-0 flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-4 py-2">
+        <span className="text-[13px]">🚗</span>
+        <span className="text-[13px] font-medium text-gray-700">Rides</span>
+      </button>
+      <button className="shrink-0 flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-4 py-2">
+        <span className="text-[13px]">🍌</span>
+        <span className="text-[13px] font-medium text-gray-700">Grocery</span>
+      </button>
+      <button className="shrink-0 flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-4 py-2">
+        <span className="text-[13px]">🏪</span>
+        <span className="text-[13px] font-medium text-gray-700">Conve...</span>
+      </button>
+    </div>
+  );
+}
+
+function CategoryCircles() {
+  return (
+    <div className="flex gap-4 px-4 mb-3 overflow-x-auto py-1" style={{ scrollbarWidth: 'none' }}>
+      {CATEGORIES.map(c => (
+        <button key={c.label} className="shrink-0 flex flex-col items-center gap-1.5 w-[60px]">
+          <div className="w-[56px] h-[56px] rounded-full bg-gray-50 flex items-center justify-center text-[26px] border border-gray-100">{c.emoji}</div>
+          <span className="text-[11px] font-medium text-gray-700 text-center leading-tight">{c.label}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function FilterPills() {
+  return (
+    <div className="flex gap-2 px-4 mb-4 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+      <button className="shrink-0 flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3.5 py-2">
+        <svg width="14" height="14" fill="none" stroke="#000" strokeWidth="2" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><path d="M12 2v8M9 5l3-3 3 3"/></svg>
+        <span className="text-[13px] font-medium">Pick-up</span>
+      </button>
+      <button className="shrink-0 flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3.5 py-2">
+        <svg width="14" height="14" fill="none" stroke="#000" strokeWidth="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <span className="text-[13px] font-medium">Offers</span>
+      </button>
+      <button className="shrink-0 flex items-center gap-1.5 bg-white border border-gray-200 rounded-full px-3.5 py-2">
+        <span className="text-[13px] font-medium">Delivery Fee</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#000"><path d="M7 10l5 5 5-5z"/></svg>
+      </button>
+    </div>
+  );
+}
+
+function RestaurantSection({ title, restaurantIds }) {
+  const rList = restaurantIds.map(id => RESTAURANTS.find(r => r.id === id)).filter(Boolean);
+  return (
+    <div className="mb-5">
+      <div className="px-4 mb-3 flex items-center justify-between">
+        <span className="text-[20px] font-bold">{title}</span>
+        <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#000"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+        </div>
+      </div>
+      <div className="flex gap-3 px-4 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+        {rList.map(r => <RestaurantCard key={r.id} r={r} wide />)}
+      </div>
+    </div>
+  );
+}
+
+function TonightHome() {
+  const { orderCount, nudgeDismissed, setNudgeDismissed, toggleMode, hasPackagedMeals, completedOrders, lastOrder, setLastOrder } = useContext(AppCtx);
+  const [fatigueVisible, setFatigueVisible] = useState(false);
+  const [fatigueDismissed, setFatigueDismissed] = useState(false);
+  const screenRef = useRef(null);
+
+  // Loop 5: Scroll fatigue detection
+  useEffect(() => {
+    const handler = () => {
+      const ps = document.querySelector('.phone-screen');
+      if (ps && ps.scrollTop > 550 && !fatigueDismissed) {
+        setFatigueVisible(true);
+      }
+    };
+    const ps = document.querySelector('.phone-screen');
+    ps?.addEventListener('scroll', handler);
+    return () => ps?.removeEventListener('scroll', handler);
+  }, [fatigueDismissed]);
+
+  return (
+    <div className="fade-in" ref={screenRef}>
+      <StatusBar />
+      <TopBar />
+      {/* Service tabs */}
+      <ServiceTabs />
+      {/* Category circles */}
+      <CategoryCircles />
+      {/* Filter pills */}
+      <FilterPills />
+      {/* Mode toggle */}
+      <ModeToggle />
+
+      {/* ── ORDER TRACKER with post-purchase nudge ── */}
+      {lastOrder && (
+        <div className="mx-4 mb-3 fade-in">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            {/* Tracker header */}
+            <div className="p-3.5 pb-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 bg-black rounded-full flex items-center justify-center">
+                    <svg width="18" height="18" fill="none" stroke="#fff" strokeWidth="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                  </div>
+                  <div>
+                    <div className="text-[13px] font-semibold">Arriving in {lastOrder.restaurant?.time || '20-30 min'}</div>
+                    <div className="text-[11px] text-gray-500">From {lastOrder.restaurant?.name}</div>
+                  </div>
+                </div>
+                <button onClick={() => setLastOrder(null)} className="w-6 h-6 flex items-center justify-center text-gray-300 text-lg">×</button>
+              </div>
+              {/* Progress bar */}
+              <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-full bg-black rounded-full" style={{width: '35%', transition: 'width 1s ease'}} />
+              </div>
+              <div className="flex justify-between mt-1.5 text-[9px] text-gray-400">
+                <span>Preparing</span><span>On the way</span><span>Delivered</span>
+              </div>
+              {/* Food thumbnails */}
+              <div className="flex gap-1.5 mt-2.5">
+                {lastOrder.items?.slice(0, 4).map((item, i) => (
+                  <img key={i} src={item.img} className="w-10 h-10 rounded-lg object-cover border border-gray-100" />
+                ))}
+                {lastOrder.items?.length > 4 && <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-[10px] text-gray-500 font-medium">+{lastOrder.items.length - 4}</div>}
+              </div>
+            </div>
+            {/* Post-purchase nudge — integrated below tracker */}
+            <div className="bg-[#F0FDF4] p-3.5 border-t border-[#D1FAE5]">
+              <div className="flex items-center gap-2.5">
+                <div className="flex -space-x-1.5 shrink-0">
+                  {MEALS.slice(0, 3).map(m => <img key={m.id} src={m.img} className="w-9 h-9 rounded-xl border-2 border-white object-cover" />)}
+                </div>
+                <div className="flex-1">
+                  <div className="text-[12px] font-semibold text-[#064E3B]">Skip the wait next time</div>
+                  <div className="text-[10px] text-green-700 mt-0.5">Chef-made meals, ready when you are</div>
+                </div>
+              </div>
+              <button onClick={() => toggleMode('thisweek')} className="mt-2.5 w-full bg-[#064E3B] text-white rounded-full py-2 text-[11px] font-semibold">Explore weekly meals</button>
+            </div>
+          </div>
+          <Annotation text="ORDER TRACKER + POST-PURCHASE NUDGE: Natural placement — user sees nudge while tracking delivery." />
+        </div>
+      )}
+
+      {/* ── LOOP 3: REPEAT BEHAVIOR — contextual nudge ── */}
+      {orderCount >= 3 && !nudgeDismissed && (
+        <div className="mx-4 mb-3 bg-amber-50 rounded-xl p-3 relative fade-in border border-amber-100">
+          <button onClick={() => setNudgeDismissed(true)} className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-400 text-lg">×</button>
+          <div className="flex items-center gap-2.5 pr-6">
+            <span className="text-[16px]">🔁</span>
+            <div>
+              <div className="text-[13px] font-semibold text-amber-900">Order this often? Get it ready for the week</div>
+              <div className="text-[11px] text-amber-700 mt-0.5">Same meals, zero wait time — just heat and eat</div>
+            </div>
+          </div>
+          <button onClick={() => toggleMode('thisweek')} className="mt-2 text-[12px] font-semibold text-amber-800 bg-amber-100 rounded-full px-3 py-1.5 inline-block">Set up for later →</button>
+          <Annotation text="REPEAT BEHAVIOR LOOP: Triggered by ordering frequency. Feels earned." />
+        </div>
+      )}
+
+      {/* Restaurant sections - horizontal scroll cards like real Uber Eats */}
+      {RESTAURANT_SECTIONS.slice(0, 1).map((s, i) => (
+        <RestaurantSection key={i} title={s.title} restaurantIds={s.ids} />
+      ))}
+
+      {RESTAURANT_SECTIONS.slice(1, 2).map((s, i) => (
+        <RestaurantSection key={i + 1} title={s.title} restaurantIds={s.ids} />
+      ))}
+
+      {RESTAURANT_SECTIONS.slice(2).map((s, i) => (
+        <RestaurantSection key={i + 2} title={s.title} restaurantIds={s.ids} />
+      ))}
+
+      {/* ── LOOP 5: SCROLL FATIGUE — only after extensive browsing ── */}
+      {fatigueVisible && !fatigueDismissed && (
+        <div className="mx-4 mb-4 fade-in">
+          <div className="bg-white rounded-2xl border-2 border-gray-100 p-4 relative">
+            <button onClick={() => { setFatigueDismissed(true); setFatigueVisible(false); }} className="absolute top-3 right-3 w-6 h-6 flex items-center justify-center text-gray-300 text-lg">×</button>
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-1.5 shrink-0">
+                {MEALS.slice(2, 5).map(m => <img key={m.id} src={m.img} className="w-11 h-11 rounded-xl border-2 border-white object-cover" />)}
+              </div>
+              <div className="flex-1 pr-4">
+                <div className="text-[13px] font-semibold">Can't decide tonight?</div>
+                <div className="text-[11px] text-gray-500 mt-0.5">Your weeknight meals could already be sorted</div>
+              </div>
+            </div>
+            <button onClick={() => toggleMode('thisweek')} className="mt-3 w-full border-2 border-[#064E3B] text-[#064E3B] rounded-full py-2 text-[12px] font-semibold">See how it works →</button>
+          </div>
+          <Annotation text="SCROLL FATIGUE: Only after scrolling past all sections. Low-pressure." />
+        </div>
+      )}
+      <div className="h-2" />
+    </div>
+  );
+}
+
+// ─── SCREEN 2: THIS WEEK — PLAN YOUR WEEK ──────────────────────────────────
+
+function ThisWeekHome() {
+  const [step, setStep] = useState('value');
+  const [diet, setDiet] = useState(null);
+  const [numDays, setNumDays] = useState(null);
+  const [plan, setPlan] = useState([]);
+  const [addingDay, setAddingDay] = useState(null);
+  const [addTab, setAddTab] = useState('packaged');
+  const { navigate, setCart, isReturningUser, lastWeekPlan, completedOrders } = useContext(AppCtx);
+  const [returningMode, setReturningMode] = useState(null); // null = dashboard, 'edit' = editing plan
+
+  const PACKAGED_HINTS = [
+    { badge: '💪 High-protein pick to power your Monday', color: 'bg-orange-50 text-orange-700' },
+    { badge: '💚 Nutritionist recommended · Most people keep this one', color: 'bg-green-50 text-green-700' },
+    { badge: '⭐ From a cuisine you love', color: 'bg-blue-50 text-blue-700' },
+    { badge: '🎯 Comfort pick — great for a midweek reset', color: 'bg-purple-50 text-purple-700' },
+  ];
+  const RESTAURANT_HINT = { badge: '🍕 Friday treat night · From your favourite spot', color: 'bg-amber-50 text-amber-700' };
+
+  const buildPlan = (d, n) => {
+    const vegPool = MEALS.filter(m => m.tags.includes('Vegan'));
+    const proPool = MEALS.filter(m => m.tags.some(t => ['High Protein','Low Carb'].includes(t)));
+    const anyPool = [MEALS[0], MEALS[1], MEALS[3], MEALS[4], MEALS[5], MEALS[8], MEALS[9]];
+    const pool = d === 'veg' ? vegPool : d === 'protein' ? proPool : anyPool;
+    return ['Mon','Tue','Wed','Thu','Fri'].slice(0, n).map((day, i) => {
+      const isRestaurant = (i === n - 1 && n >= 4);
+      return {
+        day, date: PLAN_DATES[i],
+        meal: isRestaurant ? RESTAURANT_DISHES[0] : pool[i % pool.length],
+        type: isRestaurant ? 'restaurant' : 'packaged',
+        skipped: false,
+        hint: isRestaurant ? RESTAURANT_HINT : PACKAGED_HINTS[i] || null,
+      };
+    });
+  };
+
+  const startPlan = (d, n) => { setDiet(d); setNumDays(n); setPlan(buildPlan(d, n)); setStep('plan'); };
+  const toggleSkip = (i) => setPlan(p => p.map((d, j) => j === i ? { ...d, skipped: !d.skipped } : d));
+  const swapMeal = (dayIdx, meal, type) => {
+    setPlan(p => p.map((d, j) => j === dayIdx ? { ...d, meal, type, skipped: false } : d));
+    setAddingDay(null);
+  };
+
+  const activeDays = plan.filter(d => !d.skipped && d.meal);
+  const planTotal = activeDays.reduce((s, d) => s + (d.meal?.price || 0), 0);
+  const deliveryFee = 3.99;
+
+  const confirmPlan = () => { setCart(activeDays.map(d => d.meal)); navigate('schedule'); };
+
+  return (
+    <div className="fade-in">
+      <StatusBar />
+      <TopBar />
+      <ModeToggle />
+
+      {/* ── RETURNING USER: SPEED-FIRST DASHBOARD ── */}
+      {isReturningUser && step === 'value' && returningMode === null && (() => {
+        const DAYS_LABEL = ['Mon','Tue','Wed','Thu','Fri'];
+        const lastPlan = lastWeekPlan || MEALS.slice(0, 4);
+        const avgCal = lastPlan.length ? Math.round(lastPlan.reduce((s,m) => s + (m.cal||0), 0) / lastPlan.length) : 0;
+        const avgProtein = lastPlan.length ? Math.round(lastPlan.reduce((s,m) => s + (m.protein||0), 0) / lastPlan.length) : 0;
+        const lastTotal = lastPlan.reduce((s,m) => s + (m.price||0), 0);
+        const focusTag = avgProtein >= 30 ? 'High protein focus' : avgCal <= 450 ? 'Light & balanced' : 'Balanced mix';
+        return (
+          <div className="px-4 pb-6 fade-in">
+            {/* Welcome back */}
+            <div className="mb-4">
+              <div className="text-[20px] font-bold">Welcome back 👋</div>
+              <div className="text-[13px] text-gray-500">Your next week is ready to lock</div>
+            </div>
+
+            {/* Quick actions */}
+            <div className="space-y-2 mb-4">
+              <button onClick={() => { setCart(lastPlan); navigate('schedule'); }} className="w-full flex items-center gap-3.5 p-4 rounded-2xl bg-[#064E3B] text-white">
+                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-[18px]">↻</div>
+                <div className="flex-1 text-left">
+                  <div className="text-[14px] font-semibold">Repeat last week</div>
+                  <div className="text-[12px] text-green-200">{lastPlan.length} meals · ${lastTotal.toFixed(2)} · One tap to lock</div>
+                </div>
+                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button onClick={() => { setPlan(DAYS_LABEL.slice(0, lastPlan.length).map((day, i) => ({ day, date: PLAN_DATES[i], meal: lastPlan[i], type: lastPlan[i]?.from ? 'restaurant' : 'packaged', skipped: false, hint: null }))); setReturningMode('edit'); setStep('plan'); }} className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl border-2 border-gray-100 bg-white">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[18px]">✏️</div>
+                <div className="flex-1 text-left">
+                  <div className="text-[14px] font-semibold">Edit & lock</div>
+                  <div className="text-[12px] text-gray-500">Start from last week, swap what you want</div>
+                </div>
+                <svg width="20" height="20" fill="none" stroke="#9CA3AF" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+              <button onClick={() => { setStep('prefs'); }} className="w-full flex items-center gap-3.5 p-3.5 rounded-2xl border-2 border-gray-100 bg-white">
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-[18px]">🆕</div>
+                <div className="flex-1 text-left">
+                  <div className="text-[14px] font-semibold">Build a new plan</div>
+                  <div className="text-[12px] text-gray-500">Fresh preferences, new meals</div>
+                </div>
+                <svg width="20" height="20" fill="none" stroke="#9CA3AF" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+              </button>
+            </div>
+            <Annotation text="EXISTING USER: Speed-first. 1 tap to repeat, no re-education." />
+
+            {/* Last week recap */}
+            <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-[13px] font-semibold">Your last week</div>
+                <div className="text-[11px] text-gray-400">Week of Mar 24</div>
+              </div>
+              {lastPlan.map((m, i) => (
+                <div key={m.id + '-' + i} className="flex items-center gap-3 py-1.5">
+                  <span className="text-[12px] font-bold text-gray-400 w-8">{DAYS_LABEL[i]}</span>
+                  <img src={m.img} className="w-9 h-9 rounded-lg object-cover" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[12px] font-medium truncate">{m.name}</div>
+                    <div className="text-[10px] text-gray-400">{m.cal} cal · {m.protein}g protein</div>
+                  </div>
+                  <span className="text-[11px] font-semibold text-gray-500">${m.price.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Light metrics */}
+            <div className="flex gap-2 mb-4">
+              <div className="flex-1 bg-orange-50 rounded-xl p-3 text-center">
+                <div className="text-[16px] font-bold text-orange-600">{avgCal}</div>
+                <div className="text-[9px] font-medium text-orange-500">avg cal/meal</div>
+              </div>
+              <div className="flex-1 bg-red-50 rounded-xl p-3 text-center">
+                <div className="text-[16px] font-bold text-red-600">{avgProtein}g</div>
+                <div className="text-[9px] font-medium text-red-500">avg protein</div>
+              </div>
+              <div className="flex-1 bg-green-50 rounded-xl p-3 text-center">
+                <div className="text-[16px] font-bold text-[#064E3B]">{completedOrders}</div>
+                <div className="text-[9px] font-medium text-green-600">{completedOrders === 1 ? 'week' : 'weeks'} completed</div>
+              </div>
+            </div>
+            <div className="bg-[#F0FDF4] rounded-xl p-2.5 text-center mb-2">
+              <div className="text-[11px] text-[#064E3B] font-medium">Last week: {focusTag} · {lastPlan.length} meals · ${lastTotal.toFixed(2)}</div>
+            </div>
+            <Annotation text="LIGHT METRICS: Engagement-driving, not overwhelming. Feels personal." />
+          </div>
+        );
+      })()}
+
+      {/* ── STEP 1: VALUE SCREEN (NEW USER ONLY) ── */}
+      {(!isReturningUser || returningMode !== null) && step === 'value' && (
+        <div className="px-4 pb-6">
+          <div className="bg-gradient-to-br from-[#064E3B] to-[#065F46] rounded-2xl overflow-hidden mb-4 relative">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=200&fit=crop" alt="Healthy meal" className="w-full h-[120px] object-cover opacity-40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#064E3B] via-[#064E3B]/80 to-transparent" />
+            <div className="relative px-5 pb-5 pt-0 -mt-[70px] text-white">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-green-300 mb-1.5">New on Uber Eats</div>
+              <div className="text-[20px] font-bold leading-tight">5 dinners. 1 delivery.<br/>You're done for the week.</div>
+              <div className="text-[12px] text-green-200 mt-2">Chef-made meals picked for you. Just heat and eat.</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-2 mb-4">
+            {[['⏱️','0 wait time','Heat and eat'],['🔄','Fully flexible','Skip or swap anytime'],['🥗','Eat healthy','All week, effortlessly']].map(([icon,title,sub]) => (
+              <div key={title} className="bg-[#F0FDF4] rounded-xl p-3 text-center">
+                <div className="text-[20px] mb-0.5">{icon}</div>
+                <div className="text-[12px] font-bold text-[#064E3B] leading-tight">{title}</div>
+                <div className="text-[10px] text-green-700 leading-tight mt-0.5">{sub}</div>
+              </div>
+            ))}
+          </div>
+          {/* Before vs after */}
+          <div className="bg-gray-50 rounded-xl p-3 mb-2 flex items-center gap-3">
+            <div className="flex-1 text-center border-r border-gray-200 pr-3">
+              <div className="text-[10px] text-gray-400 uppercase font-semibold">Last week</div>
+              <div className="text-[13px] font-bold text-gray-800 mt-0.5">8 orders</div>
+              <div className="text-[10px] text-gray-400">$127 spent</div>
+            </div>
+            <div className="text-gray-300 text-lg">→</div>
+            <div className="flex-1 text-center pl-3">
+              <div className="text-[10px] text-[#059669] uppercase font-semibold">This week</div>
+              <div className="text-[13px] font-bold text-[#064E3B] mt-0.5">0 decisions</div>
+              <div className="text-[10px] text-[#059669]">~$85 total</div>
+            </div>
+          </div>
+          <Annotation text="Value-first entry. Sell the outcome, not the feature." />
+          {/* Sample plan preview */}
+          <div className="bg-gray-50 rounded-2xl p-4 mb-4 mt-2">
+            <div className="text-[13px] font-semibold mb-1">This is what your week could look like</div>
+            <div className="text-[10px] text-gray-400 mb-3">Skip or swap anything — it's fully flexible</div>
+            {[
+              { day:'Mon', label:'Thai Basil Chicken Bowl', tag:'520 cal · 38g protein', img: MEALS[0].img },
+              { day:'Tue', label:'Mediterranean Quinoa', tag:'380 cal · 14g protein', img: MEALS[1].img },
+              { day:'Wed', label:'Grilled Chicken Caesar', tag:'490 cal · 40g protein', img: MEALS[5].img },
+              { day:'Thu', label:'Chickpea Tikka Masala', tag:'460 cal · 18g protein', img: MEALS[4].img },
+              { day:'Fri', label:'Friday = your treat night 🍕', tag:'Pick a restaurant fave', img: RESTAURANTS[6].img },
+            ].map(d => (
+              <div key={d.day} className="flex items-center gap-3 py-1.5">
+                <span className="text-[12px] font-bold text-gray-400 w-8">{d.day}</span>
+                <img src={d.img} className="w-9 h-9 rounded-lg object-cover" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12px] font-medium truncate">{d.label}</div>
+                  <div className="text-[10px] text-gray-400">{d.tag}</div>
+                </div>
+              </div>
+            ))}
+            {/* Nutrition snapshot */}
+            <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+              <div className="text-[10px] text-gray-500 font-medium">Weekly snapshot</div>
+              <div className="flex gap-3">
+                <span className="text-[10px] font-semibold text-orange-600">~2,330 cal/day</span>
+                <span className="text-[10px] font-semibold text-red-600">~28g protein/day</span>
+              </div>
+            </div>
+          </div>
+          {/* Flexibility */}
+          <div className="space-y-2 mb-5">
+            {['Skip any day — no penalties','Swap meals anytime','Mix with restaurant orders','No subscription — order once or weekly'].map(t => (
+              <div key={t} className="flex items-center gap-2">
+                <div className="w-5 h-5 rounded-full bg-[#D1FAE5] flex items-center justify-center shrink-0">
+                  <svg width="12" height="12" fill="none" stroke="#059669" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+                </div>
+                <span className="text-[12px] text-gray-600">{t}</span>
+              </div>
+            ))}
+          </div>
+          <Annotation text="Flexibility kills subscription fear — #1 barrier to trial" />
+          <button onClick={() => setStep('prefs')} className="w-full bg-[#064E3B] text-white rounded-full py-3.5 font-semibold text-[14px] shadow-lg">
+            Show me my personalised plan ✨
+          </button>
+          <div className="text-[11px] text-gray-400 text-center mt-2">Takes 10 seconds · No commitment</div>
+        </div>
+      )}
+
+      {/* ── STEP 2: QUICK PREFS ── */}
+      {step === 'prefs' && (
+        <div className="px-4 pb-6">
+          {!diet ? (
+            <>
+              <div className="text-[18px] font-bold mt-1 mb-1">What sounds like you?</div>
+              <div className="text-[13px] text-gray-500 mb-4">We'll do the rest — you just pick a vibe</div>
+              <div className="space-y-2.5">
+                {[
+                  { id:'any', emoji:'🍽️', label:'Anything goes', desc:'Balanced mix of everything' },
+                  { id:'veg', emoji:'🥬', label:'Vegetarian', desc:'Plant-forward meals' },
+                  { id:'protein', emoji:'💪', label:'High Protein', desc:'Fuel for active days' },
+                ].map(opt => (
+                  <button key={opt.id} onClick={() => setDiet(opt.id)} className="w-full flex items-center gap-3.5 p-4 rounded-2xl border-2 border-gray-100 hover:border-[#064E3B] active:border-[#064E3B] active:bg-[#F0FDF4] transition-colors text-left">
+                    <span className="text-2xl">{opt.emoji}</span>
+                    <div>
+                      <div className="text-[14px] font-semibold">{opt.label}</div>
+                      <div className="text-[12px] text-gray-500">{opt.desc}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <Annotation text="Lightweight personalization. 2 taps, not a form." className="mt-3" />
+            </>
+          ) : (
+            <div className="fade-in">
+              <div className="text-[18px] font-bold mt-1 mb-1">How much of your week?</div>
+              <div className="text-[13px] text-gray-500 mb-4">Skip or add days anytime — nothing is locked</div>
+              <div className="space-y-2.5">
+                {[
+                  { n:3, label:'3 days', desc:'Light coverage', price:'~$32' },
+                  { n:4, label:'4 days', desc:'Most popular', price:'~$44', rec:true },
+                  { n:5, label:'5 days', desc:'Full workweek', price:'~$55' },
+                ].map(opt => (
+                  <button key={opt.n} onClick={() => startPlan(diet, opt.n)} className={`w-full flex items-center justify-between p-4 rounded-2xl border-2 transition-colors text-left ${opt.rec ? 'border-[#064E3B] bg-[#F0FDF4]' : 'border-gray-100 hover:border-gray-200'}`}>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#D1FAE5] flex items-center justify-center text-[14px] font-bold text-[#064E3B]">{opt.n}</div>
+                      <div>
+                        <div className="text-[14px] font-semibold">{opt.label}</div>
+                        <div className="text-[12px] text-gray-500">{opt.desc}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[14px] font-bold text-[#064E3B]">{opt.price}</div>
+                      {opt.rec && <div className="text-[10px] text-[#059669] font-semibold">Recommended</div>}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── STEP 3: GENERATED PLAN ── */}
+      {step === 'plan' && (
+        <div className="px-4 pb-48">
+          <div className="flex items-center justify-between mb-0.5">
+            <div className="text-[20px] font-bold text-[#064E3B]">You're done for the week ✨</div>
+          </div>
+
+          {/* Social proof banner */}
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-3 mb-2 flex items-center gap-2.5">
+            <div className="text-[18px]">👥</div>
+            <div>
+              <div className="text-[12px] font-semibold text-emerald-900">2,847 people locked their week today</div>
+              <div className="text-[10px] text-emerald-600">Most keep 4 out of 5 meals · 89% reorder the next week</div>
+            </div>
+          </div>
+          <Annotation text="AHA moment — feels personal because Uber already knows you" />
+
+          {/* Nutrition summary */}
+          <div className="flex gap-2 mb-3">
+            {(() => {
+              const totals = activeDays.reduce((acc, d) => {
+                if (d.meal?.protein) acc.p += d.meal.protein;
+                if (d.meal?.carbs) acc.c += d.meal.carbs;
+                if (d.meal?.cal) acc.k += d.meal.cal;
+                return acc;
+              }, { p: 0, c: 0, k: 0 });
+              return [
+                { label: 'Avg cal', val: activeDays.length ? Math.round(totals.k / activeDays.length) : 0, unit: 'kcal', color: 'text-orange-600 bg-orange-50' },
+                { label: 'Avg protein', val: activeDays.length ? Math.round(totals.p / activeDays.length) : 0, unit: 'g', color: 'text-red-600 bg-red-50' },
+                { label: 'Avg carbs', val: activeDays.length ? Math.round(totals.c / activeDays.length) : 0, unit: 'g', color: 'text-blue-600 bg-blue-50' },
+              ].map(n => (
+                <div key={n.label} className={`flex-1 rounded-xl p-2 text-center ${n.color}`}>
+                  <div className="text-[15px] font-bold">{n.val}<span className="text-[9px] font-normal ml-0.5">{n.unit}</span></div>
+                  <div className="text-[9px] font-medium opacity-70">{n.label}</div>
+                </div>
+              ));
+            })()}
+          </div>
+
+          {/* Day cards */}
+          <div className="space-y-3 mb-4">
+            {plan.map((d, i) => (
+              <div key={i} className={`rounded-2xl border-2 overflow-hidden transition-all ${d.skipped ? 'border-gray-100 bg-gray-50 opacity-60' : d.type === 'restaurant' ? 'border-amber-200 bg-amber-50/30' : 'border-gray-100 bg-white'}`}>
+                {/* Personalization hint */}
+                {!d.skipped && d.hint && (
+                  <div className={`px-3.5 py-1.5 text-[10px] font-semibold ${d.hint.color}`}>{d.hint.badge}</div>
+                )}
+                <div className="flex items-center justify-between px-3.5 pt-2 pb-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[13px] font-bold">{d.day}</span>
+                    <span className="text-[11px] text-gray-400">{d.date}</span>
+                    {d.type === 'restaurant' && !d.skipped && <span className="text-[9px] bg-amber-100 text-amber-700 font-semibold px-1.5 py-0.5 rounded-full">Restaurant</span>}
+                  </div>
+                  <button onClick={() => toggleSkip(i)} className={`text-[11px] font-semibold px-2.5 py-1 rounded-full ${d.skipped ? 'text-[#064E3B] bg-[#D1FAE5]' : 'text-gray-400'}`}>
+                    {d.skipped ? 'Unskip' : 'Skip'}
+                  </button>
+                </div>
+                {d.skipped ? (
+                  <div className="px-3.5 py-3 flex items-center justify-between">
+                    <span className="text-[12px] text-gray-400 line-through">Skipped</span>
+                    <button onClick={() => { toggleSkip(i); setAddingDay(i); setAddTab('packaged'); }} className="text-[12px] font-semibold text-[#064E3B]">+ Add meal</button>
+                  </div>
+                ) : d.meal ? (
+                  <div className="px-3.5 pb-3">
+                    <div className="flex items-center gap-3 mt-0.5">
+                      <img src={d.meal.img} alt={d.meal.name} className="w-[60px] h-[60px] rounded-xl object-cover shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-semibold leading-tight">{d.meal.name}</div>
+                        <div className="text-[11px] text-gray-500 mt-0.5">
+                          {d.type === 'restaurant' ? d.meal.from : getCreator(d.meal.creatorId)?.name}
+                        </div>
+                        {/* Nutrition chips */}
+                        <div className="flex items-center gap-1.5 mt-1">
+                          {d.meal.cal && <span className="text-[9px] font-semibold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">{d.meal.cal} cal</span>}
+                          {d.meal.protein && <span className="text-[9px] font-semibold bg-red-50 text-red-600 px-1.5 py-0.5 rounded">{d.meal.protein}g protein</span>}
+                          {d.meal.carbs && <span className="text-[9px] font-semibold bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded">{d.meal.carbs}g carbs</span>}
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-[13px] font-bold">${d.meal.price.toFixed(2)}</span>
+                          {d.type === 'restaurant' && d.meal.time && <span className="text-[10px] text-amber-600">{d.meal.time} delivery</span>}
+                        </div>
+                      </div>
+                    </div>
+                    {/* Actions row */}
+                    <div className="flex items-center gap-2 mt-2">
+                      <button onClick={() => { setAddingDay(i); setAddTab(d.type === 'restaurant' ? 'restaurant' : 'packaged'); }} className="text-[11px] font-semibold text-[#064E3B] border border-[#D1FAE5] rounded-full px-3 py-1">Change meal</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="px-3.5 py-3">
+                    <button onClick={() => { setAddingDay(i); setAddTab('packaged'); }} className="text-[12px] font-semibold text-[#064E3B]">+ Add meal</button>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Add another day */}
+            {plan.length < 5 && (
+              <button onClick={() => {
+                const next = ['Mon','Tue','Wed','Thu','Fri'][plan.length];
+                setPlan(p => [...p, { day: next, date: PLAN_DATES[plan.length], meal: null, type: 'packaged', skipped: false }]);
+                setAddingDay(plan.length);
+                setAddTab('packaged');
+              }} className="w-full border-2 border-dashed border-gray-200 rounded-2xl py-4 text-center">
+                <span className="text-[13px] font-semibold text-gray-400">+ Add another day</span>
+              </button>
+            )}
+          </div>
+
+          {/* System intelligence */}
+          <div className="bg-[#F0FDF4] rounded-xl p-3 mb-2">
+            <div className="text-[11px] text-[#064E3B] font-medium text-center">
+              ✅ Balanced across your week · Adjusted for your eating habits
+            </div>
+          </div>
+          <div className="bg-gray-50 rounded-xl p-3 mb-4">
+            <div className="text-[11px] text-gray-500 font-medium text-center">
+              🔓 Change anytime · Skip anytime · Pause anytime · Still order restaurants normally
+            </div>
+          </div>
+          <Annotation text="Anti-subscription reinforcement at decision moment" />
+
+          {/* Price summary */}
+          <div className="bg-gray-50 rounded-xl p-4 mb-2">
+            <div className="flex justify-between text-[12px] mb-1"><span className="text-gray-500">{activeDays.length} meals</span><span>${planTotal.toFixed(2)}</span></div>
+            <div className="flex justify-between text-[12px] mb-1"><span className="text-gray-500">Delivery</span><span>$3.99</span></div>
+            <div className="flex justify-between text-[14px] font-bold pt-2 border-t border-gray-200"><span>Total</span><span>${(planTotal + deliveryFee).toFixed(2)}</span></div>
+          </div>
+          {/* Light urgency */}
+          <div className="text-[10px] text-amber-600 text-center font-medium mb-3">⏰ Lock before 8 PM Sunday for Monday delivery</div>
+          {/* Confirm CTA — inline */}
+          {activeDays.length > 0 && (
+            <div className="mb-2">
+              <button onClick={confirmPlan} className="w-full bg-[#064E3B] text-white rounded-full py-3.5 px-5 flex items-center justify-between font-semibold text-[14px] shadow-lg">
+                <span>Lock my week →</span>
+                <span>${(planTotal + deliveryFee).toFixed(2)}</span>
+              </button>
+              <div className="text-[10px] text-gray-400 text-center mt-1.5">You can change anything later</div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Plan confirm — inline, not sticky */}
+
+      {/* ── ADD/SWAP BOTTOM SHEET ── */}
+      {addingDay !== null && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={() => setAddingDay(null)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="w-[375px] bg-white rounded-t-3xl slide-up relative z-10 pb-8" style={{ maxHeight: '65vh', overflow: 'hidden' }} onClick={e => e.stopPropagation()}>
+            <div className="sticky top-0 bg-white pt-3 pb-2 px-4 border-b border-gray-100 z-10">
+              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-3" />
+              <div className="text-[15px] font-bold">Pick a meal for {plan[addingDay]?.day}</div>
+              <div className="text-[10px] text-gray-400 mt-0.5">Chef meals or restaurant — mix however you like</div>
+              <div className="flex gap-2 mt-2">
+                <button onClick={() => setAddTab('packaged')} className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-colors ${addTab === 'packaged' ? 'bg-[#064E3B] text-white' : 'bg-gray-100 text-gray-600'}`}>Chef meals</button>
+                <button onClick={() => setAddTab('restaurant')} className={`px-3 py-1.5 rounded-full text-[12px] font-semibold transition-colors ${addTab === 'restaurant' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-600'}`}>Restaurants</button>
+              </div>
+            </div>
+            <div className="px-4 pt-2 overflow-y-auto" style={{ maxHeight: 'calc(65vh - 90px)' }}>
+              {addTab === 'packaged' ? (
+                <div className="space-y-0.5">
+                  {MEALS.map(m => (
+                    <button key={m.id} onClick={() => swapMeal(addingDay, m, 'packaged')} className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 text-left transition-colors">
+                      <img src={m.img} alt={m.name} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-semibold">{m.name}</div>
+                        <div className="text-[11px] text-gray-500">{getCreator(m.creatorId)?.name} · {m.cal} cal</div>
+                        <div className="flex gap-1 mt-0.5">{m.tags.slice(0,2).map(t => <span key={t} className="text-[9px] bg-[#F0FDF4] text-[#064E3B] px-1.5 py-0.5 rounded-full">{t}</span>)}</div>
+                      </div>
+                      <span className="text-[13px] font-bold shrink-0">${m.price.toFixed(2)}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="space-y-0.5">
+                  {RESTAURANT_DISHES.map(d => (
+                    <button key={d.id} onClick={() => swapMeal(addingDay, d, 'restaurant')} className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-gray-50 active:bg-gray-100 text-left transition-colors">
+                      <img src={d.img} alt={d.name} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-semibold">{d.name}</div>
+                        <div className="text-[11px] text-gray-500">{d.from} · {d.time}</div>
+                      </div>
+                      <span className="text-[13px] font-bold shrink-0">${d.price.toFixed(2)}</span>
+                    </button>
+                  ))}
+                  <Annotation text="Hybrid model — packaged + restaurant in one plan. Key differentiator." className="mt-2" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── SCREEN 3: MEAL DETAIL ───────────────────────────────────────────────────
+
+function MealDetail() {
+  const { selectedMeal: meal, inCart, addToCart, removeFromCart, navigate } = useContext(AppCtx);
+  if (!meal) return null;
+  const creator = getCreator(meal.creatorId);
+  const isIn = inCart(meal.id);
+
+  return (
+    <div className="slide-enter">
+      <BackHeader title="Meal details" />
+      {/* Hero */}
+      <div className="h-[200px] overflow-hidden">
+        <img src={meal.img} alt={meal.name} className="w-full h-full object-cover" loading="lazy" />
+      </div>
+      <div className="px-4 pt-4 pb-32">
+        <div className="text-[22px] font-bold">{meal.name}</div>
+        <button onClick={() => navigate('creatorProfile', { creator })} className="text-[14px] text-gray-500 mt-0.5">by <span className="text-uber-green font-medium">{creator?.name}</span></button>
+        <Annotation text="Creator brand visibility — differentiator vs. anonymous meal kits" />
+        {/* Tags */}
+        <div className="flex gap-1.5 mt-3">
+          {meal.tags.map(t => <span key={t} className="bg-plan-light text-plan-dark text-[11px] font-semibold px-2.5 py-1 rounded-full">{t}</span>)}
+        </div>
+        {/* Nutrition */}
+        <div className="grid grid-cols-4 gap-2 mt-4">
+          {[['Calories', meal.cal, 'kcal'], ['Protein', meal.protein, 'g'], ['Carbs', meal.carbs, 'g'], ['Fat', meal.fat, 'g']].map(([l, v, u]) => (
+            <div key={l} className="bg-gray-50 rounded-xl p-3 text-center">
+              <div className="text-[18px] font-bold">{v}<span className="text-[11px] font-normal text-gray-400">{u}</span></div>
+              <div className="text-[10px] text-gray-500 mt-0.5">{l}</div>
+            </div>
+          ))}
+        </div>
+        {/* Ingredients */}
+        <div className="mt-5">
+          <div className="text-[14px] font-semibold mb-1">Ingredients</div>
+          <div className="text-[12px] text-gray-500 leading-relaxed">{meal.ingredients}</div>
+        </div>
+        {/* Reheat */}
+        <div className="mt-4">
+          <div className="text-[14px] font-semibold mb-2">How to reheat</div>
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 bg-gray-50 rounded-xl p-3">
+              <span className="text-[14px]">🔲</span>
+              <div><div className="text-[12px] font-semibold">Microwave</div><div className="text-[11px] text-gray-500">{meal.reheatMicro}</div></div>
+            </div>
+            <div className="flex items-start gap-2 bg-gray-50 rounded-xl p-3">
+              <span className="text-[14px]">🔲</span>
+              <div><div className="text-[12px] font-semibold">Oven</div><div className="text-[11px] text-gray-500">{meal.reheatOven}</div></div>
+            </div>
+          </div>
+          <Annotation text="Trust builder — real food, not frozen mystery" />
+        </div>
+        {/* Allergens */}
+        {meal.allergens.length > 0 && (
+          <div className="mt-4">
+            <div className="text-[14px] font-semibold mb-1.5">Allergens</div>
+            <div className="flex gap-1.5">
+              {meal.allergens.map(a => <span key={a} className="bg-amber-50 text-amber-700 text-[11px] font-medium px-2.5 py-1 rounded-full">{a}</span>)}
+            </div>
+          </div>
+        )}
+      </div>
+      {/* Sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center z-30">
+        <div className="w-[375px] bg-white border-t border-gray-100 px-4 py-3 pb-8">
+          {isIn ? (
+            <button onClick={() => removeFromCart(meal.id)} className="w-full bg-red-500 text-white rounded-full py-3.5 font-semibold text-[14px]">Remove from box</button>
+          ) : (
+            <button onClick={() => addToCart(meal)} className="w-full bg-uber-green text-white rounded-full py-3.5 font-semibold text-[14px]">Add to box · ${meal.price.toFixed(2)}</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN 4: WEEKLY BOX ────────────────────────────────────────────────────
+
+function WeeklyBox() {
+  const { cart, subtotal, deliveryFee, packaging, total, uberOne, navigate } = useContext(AppCtx);
+  const count = cart.length;
+  const canProceed = count >= 4;
+
+  return (
+    <div className="slide-enter">
+      <BackHeader title="Your weekly box" />
+      <div className="px-4 pt-3 pb-32">
+        {/* Progress */}
+        <div className="bg-plan-light rounded-xl p-3.5 mb-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📦</span>
+            <div>
+              <div className="text-[14px] font-semibold text-plan-dark">{count} meal{count !== 1 ? 's' : ''} selected</div>
+              <div className="text-[12px] text-green-700">
+                {count < 4 ? `Add ${4 - count} more (minimum 4)` : count < 7 ? 'Ready to schedule!' : 'Box full (7 meals max)'}
+              </div>
+            </div>
+          </div>
+          {/* Progress bar */}
+          <div className="mt-2.5 h-1.5 bg-green-200 rounded-full overflow-hidden">
+            <div className="h-full bg-uber-green rounded-full transition-all" style={{ width: `${Math.min(100, (count / 7) * 100)}%` }} />
+          </div>
+        </div>
+        {/* Meals */}
+        {cart.length === 0 ? (
+          <div className="text-center py-8 text-gray-400 text-[14px]">Your box is empty.<br/>Add meals from the menu.</div>
+        ) : (
+          <div className="mb-4">{cart.map(m => <MealCard key={m.id} meal={m} compact />)}</div>
+        )}
+        {/* Price breakdown */}
+        {cart.length > 0 && (
+          <div className="border-t border-gray-100 pt-4 space-y-2">
+            <div className="flex justify-between text-[13px]"><span className="text-gray-500">Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+            <div className="flex justify-between text-[13px]">
+              <span className="text-gray-500">Delivery</span>
+              {uberOne ? <span className="text-uber-green font-medium"><s className="text-gray-300 mr-1">$3.99</s> FREE</span> : <span>$3.99</span>}
+            </div>
+            <div className="flex justify-between text-[13px]"><span className="text-gray-500">Packaging</span><span>$0.50</span></div>
+            <div className="flex justify-between text-[15px] font-bold pt-2 border-t border-gray-100"><span>Total</span><span>${total.toFixed(2)}</span></div>
+          </div>
+        )}
+        {/* Uber One upsell */}
+        {!uberOne && cart.length > 0 && (
+          <div className="mt-4 bg-gray-50 rounded-xl p-3.5 flex items-center gap-3">
+            <span className="bg-[#05944F] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0">One</span>
+            <div className="text-[12px]"><span className="font-semibold">Save $3.99/week with Uber One</span><br/><span className="text-gray-500">Free delivery on all orders</span></div>
+          </div>
+        )}
+        <Annotation text="Natural Uber One conversion — $208/year savings on delivery alone" className="mt-2" />
+        {/* No commitment */}
+        <div className="mt-4 bg-plan-light rounded-xl p-3 text-center">
+          <div className="text-[12px] text-plan-dark font-medium">🔓 One-time order · No subscription · Order again whenever you want</div>
+        </div>
+        <Annotation text="Anti-subscription reinforcement at conversion moment" />
+      </div>
+      {/* Sticky CTA */}
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center z-30">
+        <div className="w-[375px] bg-white border-t border-gray-100 px-4 py-3 pb-8">
+          <button onClick={() => canProceed && navigate('schedule')} disabled={!canProceed} className={`w-full rounded-full py-3.5 font-semibold text-[14px] ${canProceed ? 'bg-uber-green text-white' : 'bg-gray-200 text-gray-400'}`}>
+            {canProceed ? `Choose delivery day → $${total.toFixed(2)}` : `Add ${4 - count} more meal${4 - count > 1 ? 's' : ''} to continue`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN 5: SCHEDULE DELIVERY ─────────────────────────────────────────────
+
+function ScheduleDelivery() {
+  const { selectedDay, setSelectedDay, selectedWindow, setSelectedWindow, total, navigate, cart } = useContext(AppCtx);
+  const canOrder = selectedDay !== null && selectedWindow !== null;
+
+  return (
+    <div className="slide-enter">
+      <BackHeader title="Schedule delivery" />
+      <div className="px-4 pt-4 pb-32">
+        {/* Day picker */}
+        <div className="text-[14px] font-semibold mb-3">Pick a day</div>
+        <div className="flex gap-2 mb-5">
+          {DAYS.map((d, i) => {
+            const date = NEXT_DATES[i];
+            return (
+              <button key={i} onClick={() => setSelectedDay(i)} className={`flex-1 rounded-xl py-3 text-center border-2 transition-all ${selectedDay === i ? 'border-uber-green bg-plan-light' : 'border-gray-100 bg-white'}`}>
+                <div className="text-[13px] font-semibold">{d}</div>
+                <div className="text-[11px] text-gray-500">{date?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</div>
+              </button>
+            );
+          })}
+        </div>
+        {/* Time windows */}
+        <div className="text-[14px] font-semibold mb-3">Time window</div>
+        <div className="space-y-2 mb-5">
+          {WINDOWS.map((w, i) => (
+            <button key={i} onClick={() => setSelectedWindow(i)} className={`w-full text-left rounded-xl p-3.5 border-2 transition-all flex items-center justify-between ${selectedWindow === i ? 'border-uber-green bg-plan-light' : 'border-gray-100'}`}>
+              <div className="flex items-center gap-2">
+                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${selectedWindow === i ? 'border-uber-green' : 'border-gray-300'}`}>
+                  {selectedWindow === i && <div className="w-2 h-2 rounded-full bg-uber-green" />}
+                </div>
+                <span className="text-[13px] font-medium">{w}</span>
+              </div>
+              {i === 0 && <span className="text-[10px] font-semibold bg-plan-light text-uber-green px-2 py-0.5 rounded-full">Recommended</span>}
+            </button>
+          ))}
+          <Annotation text="Guides to off-peak = fills 10am-4pm courier dead zone" />
+        </div>
+        {/* Delivery info */}
+        <div className="bg-gray-50 rounded-xl p-4 space-y-2.5">
+          <div className="flex items-center gap-2 text-[13px]"><span>📍</span><span className="font-medium">742 Evergreen Terrace</span></div>
+          <div className="text-[12px] text-gray-500">Leave at door · No signature needed</div>
+          <div className="text-[12px] text-gray-500">All meals arrive sealed & refrigerated in insulated packaging</div>
+          <Annotation text="Cold chain trust. Addresses #1 consumer fear." />
+        </div>
+      </div>
+      {/* CTA */}
+      <div className="fixed bottom-0 left-0 right-0 flex justify-center z-30">
+        <div className="w-[375px] bg-white border-t border-gray-100 px-4 py-3 pb-8">
+          <button onClick={() => canOrder && navigate('confirmation')} disabled={!canOrder} className={`w-full rounded-full py-3.5 font-semibold text-[14px] ${canOrder ? 'bg-uber-green text-white' : 'bg-gray-200 text-gray-400'}`}>
+            {canOrder ? `Place order · $${total.toFixed(2)}` : 'Select day & time'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── TONIGHT FLOW: RESTAURANT DETAIL ─────────────────────────────────────────
+
+function RestaurantDetail() {
+  const { selectedRestaurant: r, navigate, addToHotCart, hotCart, toggleMode } = useContext(AppCtx);
+  const [addedNudge, setAddedNudge] = useState(false);
+  if (!r) return null;
+  const menu = RESTAURANT_MENUS[r.id] || DEFAULT_MENU;
+  const hotCartCount = hotCart.reduce((s, i) => s + (i.qty || 1), 0);
+  const hotCartTotal = hotCart.reduce((s, i) => s + i.price * (i.qty || 1), 0);
+
+  const handleAdd = (item) => {
+    addToHotCart(item);
+    if (!addedNudge) setTimeout(() => setAddedNudge(true), 600);
+  };
+
+  return (
+    <div className="slide-enter">
+      {/* Hero */}
+      <div className="relative h-[180px] overflow-hidden">
+        <img src={r.img} alt={r.name} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <button onClick={() => navigate('tonight')} className="absolute top-14 left-4 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md z-10">
+          <svg width="18" height="18" fill="none" stroke="#000" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        </button>
+        <div className="absolute bottom-3 left-4 right-4">
+          <div className="text-white text-[20px] font-bold">{r.name}</div>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-white/90 text-[13px]">{r.rating} ★ ({r.reviews})</span>
+            <span className="text-white/60 text-[13px]">·</span>
+            <span className="text-white/90 text-[13px]">{r.time}</span>
+            <span className="text-white/60 text-[13px]">·</span>
+            <span className="text-white/90 text-[13px]">{r.fee}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-4 pt-4 pb-32">
+        {r.promo && (
+          <div className="bg-[#E8F5E9] rounded-lg px-3 py-2 mb-3 text-[12px] font-semibold text-[#2E7D32]">🎉 {r.promo}</div>
+        )}
+
+        <div className="text-[16px] font-bold mb-3">Popular items</div>
+
+        {/* Menu items */}
+        <div className="space-y-3">
+          {menu.map(item => {
+            const inHot = hotCart.find(i => i.id === item.id);
+            return (
+              <div key={item.id} className="flex gap-3 pb-3 border-b border-gray-100">
+                <div className="flex-1">
+                  <div className="text-[14px] font-semibold">{item.name}</div>
+                  <div className="text-[12px] text-gray-500 mt-0.5">{item.desc}</div>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <span className="text-[14px] font-bold">${item.price.toFixed(2)}</span>
+                    <span className="text-[11px] text-gray-400">{item.cal} cal</span>
+                  </div>
+                </div>
+                <div className="relative shrink-0">
+                  <img src={item.img} alt={item.name} className="w-[90px] h-[75px] rounded-xl object-cover" />
+                  <button onClick={() => handleAdd(item)} className={`absolute -bottom-2 left-1/2 -translate-x-1/2 w-8 h-8 rounded-full flex items-center justify-center shadow-md text-[18px] ${inHot ? 'bg-black text-white' : 'bg-white text-black border border-gray-200'}`}>
+                    {inHot ? <span className="text-[12px] font-bold">{inHot.qty}</span> : '+'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── NUDGE: "For later this week" — appears AFTER first add to cart ── */}
+        {addedNudge && (
+          <div className="mt-5 bg-[#F0FDF4] rounded-xl p-3.5 fade-in border border-[#D1FAE5]">
+            <div className="flex items-center gap-3">
+              <div className="flex -space-x-1.5 shrink-0">
+                {MEALS.slice(0, 3).map(m => <img key={m.id} src={m.img} className="w-9 h-9 rounded-lg border-2 border-white object-cover" />)}
+              </div>
+              <div className="flex-1">
+                <div className="text-[12px] font-semibold text-[#064E3B]">{r.name} now delivers packed meals for the week too</div>
+                <div className="text-[10px] text-green-700">Same flavours you love, ready to heat in 3 min</div>
+              </div>
+            </div>
+            <button onClick={() => toggleMode('thisweek')} className="mt-2.5 text-[11px] font-semibold text-[#064E3B]">Explore weekly meals →</button>
+            <Annotation text="RESTAURANT EXTENSION: Shows after adding to cart. Additive, not competitive." className="mt-1" />
+          </div>
+        )}
+      </div>
+
+      {/* Sticky cart bar */}
+      {hotCartCount > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 flex justify-center z-30">
+          <div className="w-[375px] bg-white border-t border-gray-100 px-4 py-3 pb-8">
+            <button onClick={() => navigate('tonightCart')} className="w-full bg-black text-white rounded-full py-3.5 font-semibold text-[14px] flex items-center justify-between px-5">
+              <span>View cart · {hotCartCount} item{hotCartCount > 1 ? 's' : ''}</span>
+              <span>${hotCartTotal.toFixed(2)}</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── TONIGHT FLOW: CART ──────────────────────────────────────────────────────
+
+function TonightCart() {
+  const { hotCart, removeFromHotCart, hotSubtotal, hotTotal, selectedRestaurant, navigate, uberOne } = useContext(AppCtx);
+  const delivFee = uberOne ? 0 : 3.99;
+
+  return (
+    <div className="slide-enter">
+      <BackHeader title={selectedRestaurant?.name || 'Your order'} />
+      <div className="px-4 pt-3 pb-32">
+        {hotCart.length === 0 ? (
+          <div className="text-center py-12 text-gray-400 text-[14px]">Your cart is empty</div>
+        ) : (
+          <>
+            {hotCart.map(item => (
+              <div key={item.id} className="flex items-center gap-3 py-3 border-b border-gray-50">
+                <img src={item.img} alt={item.name} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-semibold truncate">{item.name}</div>
+                  <div className="text-[11px] text-gray-500">{item.cal} cal · Qty: {item.qty || 1}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-[13px] font-bold">${(item.price * (item.qty || 1)).toFixed(2)}</div>
+                  <button onClick={() => removeFromHotCart(item.id)} className="text-[11px] text-red-500 font-medium mt-0.5">Remove</button>
+                </div>
+              </div>
+            ))}
+            {/* Price breakdown — clean, no packaged meal nudges */}
+            <div className="mt-4 space-y-2">
+              <div className="flex justify-between text-[13px]"><span className="text-gray-500">Subtotal</span><span>${hotSubtotal.toFixed(2)}</span></div>
+              <div className="flex justify-between text-[13px]">
+                <span className="text-gray-500">Delivery fee</span>
+                {uberOne ? <span className="text-uber-green font-medium"><s className="text-gray-300 mr-1">$3.99</s> FREE</span> : <span>$3.99</span>}
+              </div>
+              <div className="flex justify-between text-[15px] font-bold pt-2 border-t border-gray-100"><span>Total</span><span>${hotTotal.toFixed(2)}</span></div>
+            </div>
+            {/* Delivery estimate */}
+            <div className="mt-4 bg-gray-50 rounded-xl p-3.5 flex items-center gap-3">
+              <svg width="20" height="20" fill="none" stroke="#6B7280" strokeWidth="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6h4" strokeLinecap="round"/></svg>
+              <div>
+                <div className="text-[13px] font-semibold">Estimated {selectedRestaurant?.time || '20-30 min'}</div>
+                <div className="text-[11px] text-gray-500">Delivered to 742 Evergreen Terrace</div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+      {/* Place order CTA */}
+      {hotCart.length > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 flex justify-center z-30">
+          <div className="w-[375px] bg-white border-t border-gray-100 px-4 py-3 pb-8">
+            <button onClick={() => navigate('tonightConfirmation')} className="w-full bg-black text-white rounded-full py-3.5 font-semibold text-[14px]">Place order · ${hotTotal.toFixed(2)}</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── TONIGHT FLOW: ORDER CONFIRMATION ────────────────────────────────────────
+
+function TonightConfirmation() {
+  const { hotCart, hotTotal, selectedRestaurant, toggleMode, setHotCart, setOrderCount, setLastOrder } = useContext(AppCtx);
+
+  return (
+    <div className="fade-in">
+      <div className="px-4 pt-16 pb-6 text-center">
+        <div className="w-20 h-20 mx-auto bg-black rounded-full flex items-center justify-center bounce-in">
+          <svg width="40" height="40" fill="none" stroke="#fff" strokeWidth="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div className="text-[22px] font-bold mt-5">Order placed!</div>
+        <div className="text-[14px] text-gray-500 mt-2">From {selectedRestaurant?.name}</div>
+        <div className="text-[13px] text-gray-400">Arriving in {selectedRestaurant?.time || '20-30 min'} · 742 Evergreen Terrace</div>
+      </div>
+
+      <div className="px-4 pb-6">
+        {/* Order summary */}
+        <div className="bg-gray-50 rounded-xl p-4 mb-4">
+          <div className="text-[13px] font-semibold mb-2">Order summary</div>
+          {hotCart.map(item => (
+            <div key={item.id} className="flex items-center justify-between text-[12px] py-1.5">
+              <div className="flex items-center gap-2">
+                <img src={item.img} alt={item.name} className="w-8 h-8 rounded-lg object-cover" />
+                <span className="text-gray-700">{item.qty > 1 ? `${item.qty}× ` : ''}{item.name}</span>
+              </div>
+              <span className="font-medium shrink-0 ml-2">${(item.price * (item.qty || 1)).toFixed(2)}</span>
+            </div>
+          ))}
+          <div className="flex justify-between text-[14px] font-bold mt-2 pt-2 border-t border-gray-200">
+            <span>Total</span><span>${hotTotal.toFixed(2)}</span>
+          </div>
+        </div>
+
+        {/* ── WAITING NUDGE: Idle attention capture ── */}
+        <div className="bg-white rounded-2xl p-4 mb-4 border border-gray-100 shadow-sm">
+          <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wide mb-2.5">While your order is on the way</div>
+          <div className="flex items-center gap-3">
+            <div className="flex -space-x-1.5 shrink-0">
+              {MEALS.slice(1, 4).map(m => <img key={m.id} src={m.img} className="w-11 h-11 rounded-xl border-2 border-white object-cover" />)}
+            </div>
+            <div className="flex-1">
+              <div className="text-[13px] font-semibold text-gray-900">What if tomorrow's dinner was already done?</div>
+              <div className="text-[11px] text-gray-500 mt-0.5">Chef-made meals delivered weekly · Heat in 3 min</div>
+            </div>
+          </div>
+          <button onClick={() => toggleMode('thisweek')} className="mt-3 w-full bg-gray-100 text-gray-900 rounded-full py-2.5 text-[12px] font-semibold hover:bg-gray-200 transition-colors">See how it works</button>
+          <Annotation text="IDLE NUDGE: Low-pressure, doesn't compete with current order. Curiosity-driven copy." />
+        </div>
+
+        <button onClick={() => { setLastOrder({ restaurant: selectedRestaurant, total: hotTotal, items: [...hotCart] }); setOrderCount(c => c + 1); setHotCart([]); toggleMode('tonight'); }} className="w-full bg-black text-white rounded-full py-3.5 font-semibold text-[14px]">Back to home</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN 6: CONFIRMATION ──────────────────────────────────────────────────
+
+function Confirmation() {
+  const { cart, total, selectedDay, selectedWindow, toggleMode, navigate, setPlanStatus, setHasPackagedMeals, setCompletedOrders, setOrderCount, setIsReturningUser, setLastWeekPlan } = useContext(AppCtx);
+  const day = DAYS[selectedDay];
+  const date = NEXT_DATES[selectedDay];
+  const dateStr = date?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  return (
+    <div className="fade-in">
+      <div className="px-4 pt-16 pb-8 text-center">
+        <div className="w-20 h-20 mx-auto bg-uber-green rounded-full flex items-center justify-center bounce-in">
+          <svg width="40" height="40" fill="none" stroke="#fff" strokeWidth="3" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div className="text-[22px] font-bold mt-5">You're all set!</div>
+        <div className="text-[14px] text-gray-500 mt-2">{cart.length} meals arriving {dateStr}</div>
+        <div className="text-[13px] text-gray-400">{WINDOWS[selectedWindow]} · 742 Evergreen Terrace</div>
+      </div>
+      <div className="px-4 pb-6">
+        {/* Order summary */}
+        <div className="bg-plan-light rounded-xl p-4 mb-4">
+          <div className="text-[13px] font-semibold text-plan-dark mb-2">Order summary</div>
+          {cart.map(m => (
+            <div key={m.id} className="flex items-center justify-between text-[12px] py-1.5">
+              <div className="flex items-center gap-2">
+                <img src={m.img} alt={m.name} className="w-8 h-8 rounded-lg object-cover" loading="lazy" />
+                <span className="text-gray-700">{m.name}</span>
+              </div>
+              <span className="font-medium shrink-0 ml-2">${m.price.toFixed(2)}</span>
+            </div>
+          ))}
+          <div className="flex justify-between text-[14px] font-bold mt-2 pt-2 border-t border-green-200">
+            <span>Total</span><span>${total.toFixed(2)}</span>
+          </div>
+        </div>
+        {/* Subscription upsell */}
+        <div className="bg-amber-50 rounded-xl p-4 mb-4 border border-amber-100">
+          <div className="text-[14px] font-semibold text-amber-900">💡 Save 15% every week</div>
+          <div className="text-[12px] text-amber-700 mt-1">Set up a recurring order. Skip any week with one tap. Cancel anytime.</div>
+          <button onClick={() => setPlanStatus('active')} className="mt-3 w-full border-2 border-amber-400 text-amber-900 rounded-full py-2.5 text-[13px] font-semibold">Set up recurring order →</button>
+          <div className="text-[10px] text-amber-600 text-center mt-2">You can always pause or cancel — zero commitment</div>
+          <Annotation text="Earned, not forced. Quality sells the subscription, not checkout flow." />
+        </div>
+        <button onClick={() => { setLastWeekPlan(cart.map(m => ({...m}))); setIsReturningUser(true); setHasPackagedMeals(true); setOrderCount(c => c + 1); setCompletedOrders(c => c + 1); toggleMode('tonight'); }} className="w-full bg-black text-white rounded-full py-3.5 font-semibold text-[14px]">Back to home</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN 7: CREATOR PROFILE ───────────────────────────────────────────────
+
+function CreatorProfile() {
+  const { selectedCreator: creator } = useContext(AppCtx);
+  if (!creator) return null;
+  const creatorMeals = MEALS.filter(m => m.creatorId === creator.id);
+
+  return (
+    <div className="slide-enter">
+      <BackHeader title={creator.name} />
+      <div className="px-4 pt-4 pb-24">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-16 h-16 rounded-full bg-plan-light flex items-center justify-center text-[24px] font-bold text-plan-dark">{creator.name[0]}</div>
+          <div>
+            <div className="text-[20px] font-bold">{creator.name}</div>
+            <div className="text-[13px] text-gray-500">{creator.tagline}</div>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[12px]">📍 {creator.location}</span>
+              <span className="text-[13px]">⭐ {creator.rating} ({creator.reviews})</span>
+            </div>
+          </div>
+        </div>
+        {/* Certs */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {creator.certs.map(c => (
+            <span key={c} className="bg-blue-50 text-blue-700 text-[10px] font-semibold px-2.5 py-1 rounded-full">{c}</span>
+          ))}
+        </div>
+        <Annotation text="Regulatory trust signal — food safety visible to consumer" />
+        {/* About */}
+        <div className="text-[12px] text-gray-500 leading-relaxed mt-3 mb-5">{creator.about}</div>
+        {/* Their meals */}
+        <div className="text-[15px] font-semibold mb-3">Their meals</div>
+        <div className="grid grid-cols-2 gap-3">
+          {creatorMeals.map(m => <MealCard key={m.id} meal={m} />)}
+        </div>
+      </div>
+      <StickyCartBar />
+    </div>
+  );
+}
+
+// ─── SCREEN 8: MANAGE PLAN ───────────────────────────────────────────────────
+
+function ManagePlan() {
+  const { planStatus, setPlanStatus, cart, selectedDay, navigate } = useContext(AppCtx);
+  const [showPauseConfirm, setShowPauseConfirm] = useState(false);
+  const day = DAYS[selectedDay] || 'Wednesday';
+  const date = NEXT_DATES[selectedDay || 2];
+  const dateStr = date?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  if (planStatus === 'none') {
+    return (
+      <div className="slide-enter">
+        <BackHeader title="Your meal plan" />
+        <div className="px-4 pt-12 text-center">
+          <div className="text-5xl mb-4">📋</div>
+          <div className="text-[18px] font-bold">No active plan</div>
+          <div className="text-[13px] text-gray-500 mt-2">Order weekly meals and set up a recurring plan to save 15%.</div>
+          <button onClick={() => navigate('thisweek')} className="mt-5 bg-uber-green text-white rounded-full px-6 py-3 font-semibold text-[14px]">Browse meals</button>
+        </div>
+        <div className="flex-1" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="slide-enter">
+      <BackHeader title="Your meal plan" />
+      <div className="px-4 pt-4 pb-24">
+        {/* Status */}
+        <div className="bg-plan-light rounded-xl p-4 mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <div className={`w-2.5 h-2.5 rounded-full ${planStatus === 'active' ? 'bg-uber-green' : 'bg-amber-400'}`} />
+            <span className="text-[14px] font-semibold text-plan-dark">Weekly plan · {planStatus === 'active' ? 'Active' : 'Paused'}</span>
+          </div>
+          {planStatus === 'active' && (
+            <>
+              <div className="text-[12px] text-green-700">Next delivery: {dateStr}</div>
+              <div className="text-[12px] text-green-700">{WINDOWS[0]}</div>
+              <div className="text-[12px] text-green-700">{cart.length || 5} meals selected</div>
+            </>
+          )}
+          {planStatus === 'paused' && (
+            <div className="text-[12px] text-amber-700">Paused for this week. We'll resume next week unless you pause again.</div>
+          )}
+        </div>
+        {/* This week's meals */}
+        {planStatus === 'active' && (
+          <div className="mb-4">
+            <div className="text-[14px] font-semibold mb-2">This week's meals</div>
+            {(cart.length > 0 ? cart : MEALS.slice(0, 5)).map(m => {
+              const creator = getCreator(m.creatorId);
+              return (
+                <div key={m.id} className="flex items-center gap-3 py-2.5 border-b border-gray-50">
+                  <img src={m.img} alt={m.name} className="w-11 h-11 rounded-lg object-cover shrink-0" loading="lazy" />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-medium truncate">{m.name}</div>
+                    <div className="text-[11px] text-gray-500">{creator?.name}</div>
+                  </div>
+                  <button className="text-[11px] text-uber-green font-semibold border border-uber-green rounded-full px-2.5 py-1">Swap</button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {/* Actions */}
+        {planStatus === 'active' && !showPauseConfirm && (
+          <button onClick={() => { setShowPauseConfirm(true); setPlanStatus('paused'); }} className="w-full bg-amber-50 text-amber-800 rounded-xl py-3.5 font-semibold text-[14px] mb-3 border border-amber-200">Pause this week</button>
+        )}
+        {showPauseConfirm && (
+          <div className="bg-amber-50 rounded-xl p-4 mb-3 border border-amber-200 fade-in">
+            <div className="text-[13px] font-semibold text-amber-800">✓ Paused for this week</div>
+            <div className="text-[12px] text-amber-700 mt-1">We'll resume next week unless you pause again.</div>
+            <button onClick={() => { setPlanStatus('active'); setShowPauseConfirm(false); }} className="mt-2 text-[12px] font-semibold text-uber-green">Resume plan →</button>
+          </div>
+        )}
+        <Annotation text="#1 retention mechanic. Easy pause = users stay. Hard pause = users cancel." />
+        {planStatus === 'active' && (
+          <button className="w-full border border-gray-200 text-gray-700 rounded-xl py-3 font-medium text-[13px] mb-4">Skip a meal</button>
+        )}
+        {/* Plan details */}
+        <div className="bg-gray-50 rounded-xl p-4 mt-4 space-y-1.5">
+          <div className="text-[12px] text-gray-600">Recurring every {day}</div>
+          <div className="text-[12px] text-uber-green font-medium">15% savings applied</div>
+          <div className="text-[12px] text-gray-600">Free delivery included</div>
+        </div>
+        <button onClick={() => setPlanStatus('none')} className="mt-6 text-[12px] text-gray-400 text-center w-full">Cancel plan</button>
+        <Annotation text="Cancel is available but not prominent. Pause is the encouraged path." />
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN 9: NOTIFICATIONS ─────────────────────────────────────────────────
+
+function Notifications() {
+  const notifications = [
+    { time: 'Sunday 10:00 AM', title: 'Plan your week 📋', body: 'Pick your meals for the week. No subscription, no commitment — just great food ready when you are.', icon: '📋' },
+    { time: 'Tuesday 8:30 AM', title: 'Your meals are on the way 📦', body: '5 meals arriving 9:00 AM – 1:00 PM. Please refrigerate within 2 hours.', icon: '📦' },
+    { time: 'Wednesday 6:00 PM', title: 'Running low? 🍽️', body: 'Add extra meals for the rest of the week. Same quick delivery.', icon: '🍽️' },
+  ];
+  return (
+    <div className="slide-enter">
+      <BackHeader title="Notifications" />
+      <div className="px-4 pt-4 pb-8 space-y-3">
+        <div className="text-[13px] text-gray-500 mb-2">Push notification mockups for the meal plan experience</div>
+        {notifications.map((n, i) => (
+          <div key={i} className="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <span className="text-white text-sm font-bold">UE</span>
+              </div>
+              <div className="flex-1">
+                <div className="text-[10px] text-gray-400 uppercase tracking-wide">Uber Eats · {n.time}</div>
+              </div>
+            </div>
+            <div className="text-[14px] font-semibold">{n.title}</div>
+            <div className="text-[12px] text-gray-500 mt-0.5 leading-relaxed">{n.body}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── SCREEN 10: SETTINGS ─────────────────────────────────────────────────────
+
+function Settings() {
+  const { uberOne, setUberOne, showAnnotations, setShowAnnotations, orderCount, setOrderCount } = useContext(AppCtx);
+  return (
+    <div className="slide-enter">
+      <BackHeader title="Settings" />
+      <div className="px-4 pt-2 pb-8">
+        <div className="text-[12px] text-gray-400 uppercase tracking-wide mb-2 mt-4">Prototype Controls</div>
+        <Toggle label="Uber One member" on={uberOne} onToggle={() => setUberOne(!uberOne)} />
+        <div className="text-[11px] text-gray-400 -mt-1 mb-3">Affects delivery fee + green badge across all screens</div>
+        <Toggle label="Show PM annotations" on={showAnnotations} onToggle={() => setShowAnnotations(!showAnnotations)} />
+        <div className="text-[11px] text-gray-400 -mt-1 mb-3">Toggle purple PM notes on all screens</div>
+        <Toggle label="Simulate 3+ orders this week" on={orderCount >= 3} onToggle={() => setOrderCount(orderCount >= 3 ? 0 : 3)} />
+        <div className="text-[11px] text-gray-400 -mt-1 mb-3">Shows contextual nudge banner on Tonight home</div>
+      </div>
+    </div>
+  );
+}
+
+// ─── APP ──────────────────────────────────────────────────────────────────────
+
+function App() {
+  return (
+    <AppProvider>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#1a1a2e] py-8">
+        {/* Title */}
+        <div className="text-white text-center mb-4">
+          <div className="text-[20px] font-bold">Uber Eats — Packaged Meals</div>
+          <div className="text-[13px] text-gray-400">Interactive PM Case Study Prototype</div>
+        </div>
+        <PhoneFrame />
+      </div>
+    </AppProvider>
+  );
+}
+
+function PhoneFrame() {
+  const { screen } = useContext(AppCtx);
+  return (
+    <div className="phone-frame relative">
+      <div className="notch" />
+      <div className="phone-screen">
+        {screen === 'tonight' && <TonightHome />}
+        {screen === 'thisweek' && <ThisWeekHome />}
+        {screen === 'restaurantDetail' && <RestaurantDetail />}
+        {screen === 'tonightCart' && <TonightCart />}
+        {screen === 'tonightConfirmation' && <TonightConfirmation />}
+        {screen === 'mealDetail' && <MealDetail />}
+        {screen === 'weeklyBox' && <WeeklyBox />}
+        {screen === 'schedule' && <ScheduleDelivery />}
+        {screen === 'confirmation' && <Confirmation />}
+        {screen === 'creatorProfile' && <CreatorProfile />}
+        {screen === 'manage' && <ManagePlan />}
+        {screen === 'notifications' && <Notifications />}
+        {screen === 'settings' && <Settings />}
+      </div>
+      {['tonight','thisweek','creatorProfile','manage','settings'].includes(screen) && <BottomNav />}
+      <AnnotationToggle />
+    </div>
+  );
+}
+
+function AnnotationToggle() {
+  const { showAnnotations, setShowAnnotations } = useContext(AppCtx);
+  return (
+    <button onClick={() => setShowAnnotations(!showAnnotations)} className={`absolute bottom-24 right-4 w-10 h-10 rounded-full flex items-center justify-center text-[14px] shadow-lg z-40 transition-colors ${showAnnotations ? 'bg-ann-purple text-white' : 'bg-white text-gray-400 border border-gray-200'}`}>
+      📝
+    </button>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
