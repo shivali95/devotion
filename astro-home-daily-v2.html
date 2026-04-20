@@ -3639,6 +3639,471 @@ const AskTheStars = () => {
   );
 };
 
+/* ══ GRAHA UPAY COMPONENTS ══ */
+
+const DESTINY_RITUALS = [
+  { id: 'sun', planetId: 'Sun', glyph: '☉', planet: 'सूर्य', planetEn: 'Sun',
+    day: 'Sunday', dayHi: 'रविवार', dayNum: 0, color: '#f7ab20', glowColor: 'rgba(247,171,32,0.4)',
+    title: 'सूर्य Arghya Upay',
+    recurrence: 'हर रविवार, सूर्योदय',
+    instruction: 'ताम्बे के लोटे से सूर्य को जल अर्पित करें, जल में लाल चंदन और लाल फूल डालें। "ॐ सूर्याय नमः" 11 बार बोलें।',
+    why: 'सूर्य आपकी chart में आत्मा का कारक है। सूर्य कमज़ोर होने से confidence और government matters में रुकावट आती है — arghya देने से सूर्य प्रसन्न होता है।',
+    improves: ['Self-confidence', 'Government matters', 'Father\'s health'],
+    narration: `रविवार मेरा दिन है। शिवाली जी, मैं सूर्य हूँ — आपकी आत्मा का कारक। हर रविवार सूर्योदय के समय ताम्बे के लोटे में जल लीजिए, उसमें लाल चंदन और लाल फूल डालिए, और मुझे अर्पित कीजिए। जल देते वक़्त "ॐ सूर्याय नमः" 11 बार बोलिए। ये सबसे powerful सूर्य उपाय है। इससे आपका confidence बढ़ता है, सरकारी कामों में रुकावट हटती है, और आपकी overall vitality strong रहती है। जो रविवार आप ये करती हैं, पूरा हफ़्ता अलग जाता है।`,
+    speaker: 'advait',
+    whisper: 'आज ताम्बे के लोटे से मुझे जल अर्पित कीजिए',
+  },
+  { id: 'mars', planetId: 'Mars', glyph: '♂', planet: 'मंगल', planetEn: 'Mars',
+    day: 'Tuesday', dayHi: 'मंगलवार', dayNum: 2, color: '#ff6644', glowColor: 'rgba(255,102,68,0.4)',
+    title: 'मंगल Hanuman Upay',
+    recurrence: 'हर मंगलवार, सुबह',
+    instruction: 'हनुमान चालीसा का पाठ करें, सिन्दूर का तिलक लगाएँ, और मंदिर में लाल चोला चढ़ाएँ। मसूर दाल दान करें।',
+    why: 'मंगल आपके लग्न में है — dominant planet। मंगल को strong रखने से courage, property matters और blood-related health सब सही रहता है।',
+    improves: ['Courage & willpower', 'Property matters', 'Blood health'],
+    narration: `मंगलवार मेरा दिन है। शिवाली जी, मैं आपके लग्न में बैठा हूँ — आपका सबसे dominant planet। हर मंगलवार सुबह हनुमान चालीसा का पाठ कीजिए और माथे पर सिन्दूर का तिलक लगाइए। हो सके तो हनुमान जी को लाल चोला चढ़ाइए और मसूर की दाल किसी ज़रूरतमंद को दान कीजिए। ये उपाय मुझे strong रखता है, जिससे आपकी courage, willpower और decision-making power हमेशा sharp रहे।`,
+    speaker: 'kabir',
+    whisper: 'आज हनुमान चालीसा और सिन्दूर तिलक से मुझे strong रखिए',
+  },
+  { id: 'guru', planetId: 'Mercury', glyph: '♃', planet: 'गुरु', planetEn: 'Jupiter',
+    day: 'Thursday', dayHi: 'गुरुवार', dayNum: 4, color: '#5555ff', glowColor: 'rgba(85,85,255,0.4)',
+    title: 'गुरु Brihaspati Upay',
+    recurrence: 'हर गुरुवार, सुबह',
+    instruction: 'चने की दाल और हल्दी दान करें, पीले कपड़े पहनें, केले के पेड़ पर जल चढ़ाएँ, और "ॐ बृहस्पतये नमः" 19 बार जपें। विष्णु सहस्रनाम का पाठ करें।',
+    why: 'गुरु आपके पाँचवें घर में है — wisdom और creativity का घर। गुरुवार का उपाय गुरु को strong रखता है जिससे भाग्य, विद्या और संतान सुख बना रहे।',
+    improves: ['Wisdom & luck', 'Education & growth', 'Wealth expansion'],
+    narration: `गुरुवार मेरा दिन है। शिवाली जी, मैं गुरु हूँ — बृहस्पति। आपकी chart में मैं पाँचवें घर में बैठा हूँ — wisdom और creativity वाले घर में। हर गुरुवार सुबह चने की दाल और हल्दी दान कीजिए, पीले कपड़े पहनिए। केले के पेड़ पर जल चढ़ाइए — केला मेरा वृक्ष है। "ॐ बृहस्पतये नमः" 19 बार जपिए और हो सके तो विष्णु सहस्रनाम का पाठ कीजिए। ये उपाय मुझे प्रसन्न करता है — जब मैं strong होता हूँ तो भाग्य खुलता है, नई opportunities आती हैं, और financial growth होती है।`,
+    speaker: 'advait',
+    whisper: 'आज चने की दाल दान और केले के पेड़ पर जल चढ़ाइए',
+  },
+  { id: 'saturn', planetId: 'Saturn', glyph: '♄', planet: 'शनि', planetEn: 'Saturn',
+    day: 'Saturday', dayHi: 'शनिवार', dayNum: 6, color: '#8b7fd4', glowColor: 'rgba(139,127,212,0.4)',
+    title: 'शनि Shani Upay',
+    recurrence: 'हर शनिवार, शाम',
+    instruction: 'काले तिल के तेल का दीपक जलाएँ पीपल के पेड़ के नीचे। काली उड़द दाल और सरसों का तेल दान करें। "ॐ शं शनैश्चराय नमः" 11 बार जपें।',
+    why: 'शनि आपके दसवें घर में है — career house। शनि को प्रसन्न रखने से career में obstacles हटते हैं और discipline reward होती है।',
+    improves: ['Career obstacles removed', 'Legal matters', 'Bone & joint health'],
+    narration: `शनिवार मेरा दिन है। शिवाली जी, मैं आपके दसवें घर में बैठा हूँ — career वाले घर में। हर शनिवार शाम पीपल के पेड़ के नीचे काले तिल के तेल का दीपक जलाइए। काली उड़द दाल और सरसों का तेल किसी ज़रूरतमंद को दान कीजिए। और "ॐ शं शनैश्चराय नमः" 11 बार जपिए। ये उपाय मुझे प्रसन्न करता है — मैं discipline reward करता हूँ, और जब मैं खुश होता हूँ तो career में obstacles अपने आप हटते हैं।`,
+    speaker: 'ratan',
+    whisper: 'आज तिल का दीपक और उड़द दाल दान से मुझे प्रसन्न कीजिए',
+  },
+];
+
+const CelestialRitualTimeline = ({ onRitualTap }) => {
+  const todayNum = new Date().getDay();
+  const [selectedRitual, setSelectedRitual] = useState(null);
+
+  useEffect(() => {
+    DESTINY_RITUALS.forEach((r) => {
+      queuePrefetch(r.narration, 'ritual_' + r.id, r.speaker || 'advait');
+    });
+  }, []);
+
+  const WEEK = [
+    { num: 0, hi: 'रवि', en: 'Sun' },
+    { num: 1, hi: 'सोम', en: 'Mon' },
+    { num: 2, hi: 'मंगल', en: 'Tue' },
+    { num: 3, hi: 'बुध', en: 'Wed' },
+    { num: 4, hi: 'गुरु', en: 'Thu' },
+    { num: 5, hi: 'शुक्र', en: 'Fri' },
+    { num: 6, hi: 'शनि', en: 'Sat' },
+  ];
+
+  const ritualByDay = {};
+  DESTINY_RITUALS.forEach((r, i) => { ritualByDay[r.dayNum] = { ritual: r, index: i }; });
+
+  const handleDayTap = (dayNum) => {
+    const entry = ritualByDay[dayNum];
+    if (entry) {
+      if (selectedRitual && selectedRitual.id === entry.ritual.id) {
+        onRitualTap(entry.ritual, entry.index);
+      } else {
+        setSelectedRitual(entry.ritual);
+      }
+    }
+  };
+
+  const sel = selectedRitual;
+  const hasPlanetSvg = sel && sel.planetId && typeof PlanetImg !== 'undefined';
+
+  return (
+    <div style={{ margin: '0 16px', borderRadius: 20, background: 'var(--white)',
+      boxShadow: '0 4px 24px rgba(0,0,0,0.06)', overflow: 'hidden',
+      animation: 'fadeInUp 600ms ease-out 800ms both' }}>
+
+      {/* 7-day calendar row */}
+      <div style={{ display: 'flex', padding: '14px 10px 10px', gap: 0 }}>
+        {WEEK.map((day) => {
+          const entry = ritualByDay[day.num];
+          const hasRitual = !!entry;
+          const isToday = day.num === todayNum;
+          const isSelected = sel && entry && sel.id === entry.ritual.id;
+          const color = hasRitual ? entry.ritual.color : 'var(--grey-60)';
+
+          return (
+            <div key={day.num} onClick={() => handleDayTap(day.num)}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                cursor: hasRitual ? 'pointer' : 'default', padding: '4px 0',
+                borderRadius: 12, transition: 'background 200ms',
+                background: isSelected ? `${entry.ritual.color}10` : 'transparent' }}>
+
+              <span style={{ fontSize: 9, fontWeight: 600,
+                color: hasRitual ? color : 'var(--text-disabled)', letterSpacing: 0.3 }}>
+                {day.hi}
+              </span>
+
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                position: 'relative', overflow: 'visible',
+                background: hasRitual ? 'none' : 'transparent',
+                border: 'none',
+                boxShadow: hasRitual ? `0 2px 8px ${color}25` : 'none',
+                transition: 'transform 200ms, box-shadow 200ms',
+                transform: isSelected ? 'scale(1.15)' : 'scale(1)',
+              }}>
+                {hasRitual && entry.ritual.planetId && typeof PlanetImg !== 'undefined' ? (
+                  <PlanetImg id={entry.ritual.planetId} size={36} />
+                ) : hasRitual ? (
+                  <div style={{ width: '100%', height: '100%', borderRadius: '50%',
+                    background: `radial-gradient(circle at 35% 35%, ${color}, ${color}55)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 13, color: '#fff' }}>{entry.ritual.glyph}</span>
+                  </div>
+                ) : (
+                  <span style={{ fontSize: 11, fontWeight: 600,
+                    color: 'var(--text-disabled)' }}>
+                  </span>
+                )}
+
+                {hasRitual && isToday && (
+                  <div style={{ position: 'absolute', inset: -3, borderRadius: '50%',
+                    border: `2px solid ${color}`, animation: 'breathe 2.5s ease-in-out infinite',
+                    pointerEvents: 'none' }} />
+                )}
+              </div>
+
+              {isToday && hasRitual && (
+                <div style={{ width: 4, height: 4, borderRadius: '50%',
+                  background: color }} />
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Expanded upay card */}
+      {sel && (
+        <div style={{ padding: '0 14px 14px', animation: 'fadeInUp 300ms ease-out both' }}>
+          <div onClick={() => onRitualTap(sel, ritualByDay[sel.dayNum]?.index || 0)}
+            style={{ padding: '14px', borderRadius: 14, cursor: 'pointer',
+              background: `${sel.color}06`, border: `1px solid ${sel.color}12` }}>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 32, height: 32, borderRadius: '50%', overflow: 'hidden', flexShrink: 0,
+                boxShadow: `0 2px 8px ${sel.color}20` }}>
+                {hasPlanetSvg ? <PlanetImg id={sel.planetId} size={32} /> : (
+                  <div style={{ width: '100%', height: '100%', borderRadius: '50%',
+                    background: `radial-gradient(circle at 35% 35%, ${sel.color}, ${sel.color}55)`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{ fontSize: 12, color: '#fff' }}>{sel.glyph}</span>
+                  </div>
+                )}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: 'var(--text-high)', lineHeight: 1.2 }}>
+                  {sel.title}
+                </div>
+                <div style={{ fontSize: 10, fontWeight: 600, color: sel.color, marginTop: 2 }}>
+                  {sel.recurrence}
+                </div>
+              </div>
+              <span style={{ fontSize: 14, color: sel.color, opacity: 0.5 }}>›</span>
+            </div>
+
+            <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-high)', lineHeight: 1.6,
+              marginTop: 10 }}>
+              {sel.instruction}
+            </div>
+
+            <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', marginTop: 8 }}>
+              {sel.improves.map((imp, j) => (
+                <span key={j} style={{ fontSize: 9, fontWeight: 600, color: sel.color,
+                  padding: '3px 8px', borderRadius: 8, background: `${sel.color}0a`,
+                  border: `1px solid ${sel.color}12` }}>
+                  {imp}
+                </span>
+              ))}
+            </div>
+
+            <div style={{ fontSize: 10, color: 'var(--text-disabled)', marginTop: 8, textAlign: 'center' }}>
+              tap for full ritual ›
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const RitualRevealOverlay = ({ ritual, onClose, onNext, onPrev, currentIndex, total }) => {
+  const { speaking, progress, speak, stop, toggle } = useNarration();
+  const [step, setStep] = useState(0);
+  const hasPlanetSvg = ritual.planetId && typeof PlanetImg !== 'undefined';
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      speak(ritual.narration, 'ritual_' + ritual.id, ritual.speaker || 'advait');
+    }, 500);
+    return () => { clearTimeout(timer); stop(); };
+  }, [ritual.id]);
+
+  const stepLabels = ['आह्वान', 'विधि', 'आशीर्वाद'];
+
+  const nextStep = () => { if (step < 2) setStep(s => s + 1); };
+  const prevStep = () => { if (step > 0) setStep(s => s - 1); };
+
+  const handleTap = (e) => {
+    if (e.target.closest('[data-interactive]')) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if (x < rect.width * 0.3) prevStep();
+    else if (x > rect.width * 0.7) {
+      if (step < 2) nextStep();
+      else if (onNext) onNext();
+    }
+  };
+
+  return (
+    <div style={{ position: 'absolute', inset: 0, zIndex: 100,
+      background: `radial-gradient(ellipse at 50% 20%, ${ritual.color}18 0%, #06000f 40%, #03000a 100%)`,
+      boxShadow: 'inset 0 0 0 2000px rgba(3,0,10,0.96)',
+      animation: 'fadeIn 400ms ease-out both', display: 'flex', flexDirection: 'column' }}>
+
+      <div style={{ display: 'flex', alignItems: 'center', padding: '10px 16px',
+        background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid ${ritual.color}10` }}>
+        <span style={{ fontSize: 16, color: ritual.color }}>{ritual.glyph}</span>
+        <span style={{ fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.6)', marginLeft: 8 }}>{ritual.planet} {ritual.dayHi}</span>
+        <div style={{ flex: 1 }} />
+        <div onClick={() => toggle(ritual.narration, 'ritual_' + ritual.id, ritual.speaker)} data-interactive
+          style={{ width: 30, height: 30, borderRadius: 15, marginRight: 8,
+            background: speaking ? `${ritual.color}22` : 'rgba(255,255,255,0.06)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+            fontSize: 14, color: speaking ? ritual.color : 'rgba(255,255,255,0.4)' }}>
+          {speaking ? '🔊' : '🔇'}
+        </div>
+        <div onClick={() => { stop(); onClose(); }} style={{ width: 30, height: 30, borderRadius: 15,
+          background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          cursor: 'pointer', fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>✕</div>
+      </div>
+
+      <div style={{ display: 'flex', gap: 3, padding: '8px 16px 4px', background: 'rgba(0,0,0,0.15)' }}>
+        {stepLabels.map((label, i) => (
+          <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+            <div style={{ width: '100%', height: 2.5, borderRadius: 2,
+              background: i <= step ? ritual.color : 'rgba(255,255,255,0.08)',
+              transition: 'background 400ms ease' }} />
+            <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: 0.8,
+              color: i <= step ? `${ritual.color}aa` : 'rgba(255,255,255,0.15)',
+              textTransform: 'uppercase', transition: 'color 400ms ease' }}>
+              {label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {speaking && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5, padding: '5px 16px',
+          background: 'rgba(0,0,0,0.1)' }}>
+          {[...Array(5)].map((_, i) => (
+            <div key={i} style={{ width: 2.5, borderRadius: 2, background: ritual.color,
+              animation: `soundWave 0.8s ease-in-out ${i * 0.1}s infinite alternate`, height: 6 + Math.random() * 8 }} />
+          ))}
+          <span style={{ fontSize: 10, fontWeight: 600, color: ritual.color, marginLeft: 5, opacity: 0.6 }}>
+            {ritual.planet} बोल रहा है...
+          </span>
+        </div>
+      )}
+
+      <div onClick={handleTap} style={{ flex: 1, overflow: 'auto', cursor: 'pointer' }}>
+
+        {step === 0 && (
+          <div style={{ padding: '28px 20px', animation: 'fadeInUp 400ms ease-out both' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20, position: 'relative', height: 130 }}>
+              <div style={{ position: 'relative' }}>
+                <div style={{ position: 'absolute', inset: -35, borderRadius: '50%',
+                  background: `radial-gradient(circle, ${ritual.glowColor} 0%, transparent 60%)`,
+                  animation: 'breathe 3s ease-in-out infinite' }} />
+                <div style={{ position: 'absolute', inset: -20, borderRadius: '50%',
+                  border: `1px solid ${ritual.color}12`, animation: 'orbitSlow 25s linear infinite' }} />
+                <div style={{ position: 'relative', zIndex: 1,
+                  filter: `drop-shadow(0 0 16px ${ritual.glowColor}) drop-shadow(0 0 30px ${ritual.glowColor})` }}>
+                  {hasPlanetSvg ? (
+                    <PlanetImg id={ritual.planetId} size={90} />
+                  ) : (
+                    <div style={{ width: 90, height: 90, borderRadius: '50%',
+                      background: `radial-gradient(circle at 35% 35%, ${ritual.color}, ${ritual.color}55 70%, ${ritual.color}22)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      boxShadow: `0 0 30px ${ritual.glowColor}` }}>
+                      <span style={{ fontSize: 36, color: '#fff' }}>{ritual.glyph}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 9, fontWeight: 800, color: `${ritual.color}88`, textTransform: 'uppercase',
+                letterSpacing: 2.5 }}>✦ SACRED INVOCATION ✦</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: 'rgba(255,255,255,0.93)',
+                marginTop: 8, letterSpacing: '-0.02em', lineHeight: 1.3 }}>
+                {ritual.title}
+              </div>
+              <div style={{ marginTop: 10 }}>
+                <span style={{ fontSize: 11, fontWeight: 600, color: ritual.color, padding: '4px 14px',
+                  borderRadius: 16, background: `${ritual.color}10`, border: `1px solid ${ritual.color}18` }}>
+                  {ritual.recurrence}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 22, padding: '16px', borderRadius: 16,
+              background: `linear-gradient(135deg, ${ritual.color}08, transparent)`,
+              borderLeft: `2px solid ${ritual.color}25` }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.75)',
+                lineHeight: 1.7, fontStyle: 'italic' }}>
+                "{ritual.whisper}"
+              </div>
+              <div style={{ marginTop: 10, fontSize: 12, fontWeight: 500,
+                color: 'rgba(255,255,255,0.4)', lineHeight: 1.7 }}>
+                {ritual.why}
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 24 }}>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', letterSpacing: 0.5 }}>
+                tap right for the ritual →
+              </span>
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div style={{ padding: '28px 20px', animation: 'fadeInUp 400ms ease-out both' }}>
+            <div style={{ padding: '24px 18px', borderRadius: 18,
+              background: `linear-gradient(160deg, ${ritual.color}0c 0%, ${ritual.color}04 100%)`,
+              border: `1px solid ${ritual.color}15`,
+              boxShadow: `0 0 40px ${ritual.color}06` }}>
+
+              <div style={{ textAlign: 'center', marginBottom: 16 }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <div style={{ width: 20, height: 1, background: `${ritual.color}30` }} />
+                  <span style={{ fontSize: 9, fontWeight: 800, color: `${ritual.color}77`, letterSpacing: 2.5,
+                    textTransform: 'uppercase' }}>विधि</span>
+                  <div style={{ width: 20, height: 1, background: `${ritual.color}30` }} />
+                </div>
+                <div style={{ fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.85)' }}>
+                  यह करें
+                </div>
+              </div>
+
+              <div style={{ fontSize: 17, fontWeight: 600, color: 'rgba(255,255,255,0.9)',
+                lineHeight: 1.7, textAlign: 'center', padding: '0 4px' }}>
+                {ritual.instruction}
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+                <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden',
+                  boxShadow: `0 0 12px ${ritual.glowColor}`,
+                  border: `1px solid ${ritual.color}20` }}>
+                  {hasPlanetSvg ? <PlanetImg id={ritual.planetId} size={36} /> : (
+                    <div style={{ width: '100%', height: '100%', borderRadius: '50%',
+                      background: `radial-gradient(circle at 35% 35%, ${ritual.color}, ${ritual.color}44)`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 14, color: '#fff' }}>{ritual.glyph}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginTop: 20, padding: '14px 16px', borderRadius: 14,
+              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.04)' }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.45)',
+                lineHeight: 1.8, fontStyle: 'italic', textAlign: 'center' }}>
+                "{ritual.narration}"
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 20 }}>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.2)', letterSpacing: 0.5 }}>
+                tap right for your blessing →
+              </span>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div style={{ padding: '28px 20px', animation: 'fadeInUp 400ms ease-out both' }}>
+            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+              <div style={{ fontSize: 9, fontWeight: 800, color: `${ritual.color}88`, letterSpacing: 2.5,
+                textTransform: 'uppercase' }}>✦ {ritual.planet} का आशीर्वाद ✦</div>
+              <div style={{ fontSize: 18, fontWeight: 900, color: 'rgba(255,255,255,0.9)',
+                marginTop: 8, lineHeight: 1.3 }}>
+                यह बदलेगा आपकी life में
+              </div>
+            </div>
+
+            {ritual.improves && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {ritual.improves.map((imp, j) => (
+                  <div key={j} style={{ padding: '14px 16px', borderRadius: 14,
+                    background: `${ritual.color}08`, border: `1px solid ${ritual.color}12`,
+                    display: 'flex', alignItems: 'center', gap: 12,
+                    animation: `fadeInUp 400ms ease-out ${j * 120}ms both` }}>
+                    <div style={{ width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+                      background: `${ritual.color}15`, border: `1px solid ${ritual.color}20`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <span style={{ fontSize: 14, color: ritual.color }}>✦</span>
+                    </div>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>{imp}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ marginTop: 20, padding: '14px 16px', borderRadius: 14,
+              background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)',
+              textAlign: 'center' }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.2)', letterSpacing: 1.5,
+                textTransform: 'uppercase', marginBottom: 6 }}>FROM YOUR KUNDLI</div>
+              <div style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.4)',
+                lineHeight: 1.7, fontStyle: 'italic' }}>
+                {ritual.why}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 24 }}>
+              <div data-interactive onClick={(e) => { e.stopPropagation(); if (onNext) { setStep(0); onNext(); } else onClose(); }}
+                style={{ padding: '10px 28px', borderRadius: 24,
+                  background: `linear-gradient(135deg, ${ritual.color}30, ${ritual.color}15)`,
+                  border: `1px solid ${ritual.color}25`, cursor: 'pointer',
+                  boxShadow: `0 0 20px ${ritual.color}15` }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: ritual.color }}>
+                  {onNext ? '🙏 अगला ritual →' : '🙏 स्वीकार है'}
+                </span>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: 16, fontSize: 10, color: 'rgba(255,255,255,0.15)' }}>
+              {currentIndex + 1} of {total} sacred rituals
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
 /* ══ NEW COMPONENTS: KundaliEntry, KundaliTab, BottomNav ══ */
 
 const KundaliEntry = ({ onDismiss }) => {
@@ -3690,6 +4155,13 @@ const KundaliTab = ({ onYearTap, onPlanetTap }) => {
         <LivingSolarSystem onPlanetTap={handlePlanetTap}/>
       </div>
 
+      {/* Graha Upay */}
+      <div style={{padding:'16px 0 0',background:'#fff'}} data-section="upay">
+        <SectionHeader title="Graha Upay" subtitle="Aapki kundli ke powerful upay — life 10x better" delay={150} />
+        <CelestialRitualTimeline onRitualTap={(ritual, idx) => setOverlay({ type: 'ritual', ritual, index: idx })} />
+        <div style={{height:8}}/>
+      </div>
+
       {/* Story Cards */}
       <div style={{padding:'16px 0 0',background:'#fff'}}>
         <div style={{padding:'0 16px',marginBottom:8}}>
@@ -3734,6 +4206,16 @@ const KundaliTab = ({ onYearTap, onPlanetTap }) => {
         />
       )}
       {overlay?.type==='yearCapsule'&&<YearCapsuleOverlay age={overlay.age} onClose={()=>setOverlay(null)}/>}
+      {overlay?.type==='ritual' && (
+        <RitualRevealOverlay
+          ritual={overlay.ritual}
+          currentIndex={overlay.index}
+          total={DESTINY_RITUALS.length}
+          onClose={() => setOverlay(null)}
+          onPrev={overlay.index > 0 ? () => setOverlay({ type: 'ritual', ritual: DESTINY_RITUALS[overlay.index - 1], index: overlay.index - 1 }) : null}
+          onNext={overlay.index < DESTINY_RITUALS.length - 1 ? () => setOverlay({ type: 'ritual', ritual: DESTINY_RITUALS[overlay.index + 1], index: overlay.index + 1 }) : null}
+        />
+      )}
     </div>
   );
 };
