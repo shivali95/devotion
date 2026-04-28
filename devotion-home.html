@@ -136,7 +136,7 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#faf9f6;min-heigh
 /* ── Overlay ── */
 .overlay{position:absolute;inset:0;z-index:100;background:rgba(0,0,0,0.6);display:none;align-items:flex-end;}
 .overlay.active{display:flex;}
-.overlay-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:80vh;overflow-y:auto;padding:20px;animation:slideUp 320ms var(--ease-decelerate);}
+.overlay-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding:20px;animation:slideUp 320ms var(--ease-decelerate);}
 @keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
 .overlay-close{display:flex;justify-content:center;margin-bottom:12px;}
 .overlay-handle{width:36px;height:4px;border-radius:2px;background:var(--grey-40);}
@@ -153,6 +153,9 @@ body{font-family:'JioType',-apple-system,sans-serif;background:#faf9f6;min-heigh
 
 /* ── Keyframes ── */
 @keyframes livePulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.6}50%{transform:scale(1.08);opacity:1}}
+@keyframes breatheRing{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.4}50%{transform:translate(-50%,-50%) scale(1.08);opacity:.7}}
+@keyframes floatDiya{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(-6px);opacity:1}}
 </style>
 </head>
 <body>
@@ -189,16 +192,16 @@ if (USER_FAITH === 'muslim') {
 // ═══ DATA MODELS ═══
 
 var DEITY_DATA = {
-  ganesh: { name:'Ganesh', emoji:'🕉', blessing:'Jai Shree Ganesh', color:'#f7ab20' },
-  shiva: { name:'Shiva', emoji:'🔱', blessing:'Om Namah Shivaya', color:'#6b7db3' },
-  krishna: { name:'Krishna', emoji:'🦚', blessing:'Jai Shree Krishna', color:'#3535f3' },
-  durga: { name:'Durga', emoji:'🦁', blessing:'Jai Mata Di', color:'#e63946' },
-  hanuman: { name:'Hanuman', emoji:'🏔', blessing:'Jai Bajrang Bali', color:'#ff6b35' },
-  ram: { name:'Ram', emoji:'🏹', blessing:'Jai Shree Ram', color:'#ff8c42' },
-  quran: { name:'Quran', emoji:'📖', blessing:'Bismillah', color:'#2d8a4e' },
-  salah: { name:'Salah', emoji:'🕌', blessing:'Allahu Akbar', color:'#2d8a4e' },
-  dua: { name:'Dua', emoji:'🤲', blessing:'SubhanAllah', color:'#2d8a4e' },
-  dhikr: { name:'Dhikr', emoji:'📿', blessing:'SubhanAllah', color:'#2d8a4e' },
+  ganesh: { name:'Ganesh', emoji:'🕉', darshanEmoji:'🕉', blessing:'Jai Shree Ganesh', color:'#f7ab20', gradient:'radial-gradient(circle at 50% 40%, #fff3e0 0%, #ffe0b2 25%, #ffb74d 50%, #f57c00 80%, #e65100 100%)', mantra:'Om Gan Ganapataye Namah' },
+  shiva: { name:'Shiva', emoji:'🔱', darshanEmoji:'🔱', blessing:'Om Namah Shivaya', color:'#6b7db3', gradient:'radial-gradient(circle at 50% 40%, #e8eaf6 0%, #c5cae9 25%, #9fa8da 50%, #5c6bc0 80%, #283593 100%)', mantra:'Om Namah Shivaya' },
+  krishna: { name:'Krishna', emoji:'🦚', darshanEmoji:'🪈', blessing:'Jai Shree Krishna', color:'#3535f3', gradient:'radial-gradient(circle at 50% 40%, #e3f2fd 0%, #bbdefb 25%, #64b5f6 50%, #1976d2 80%, #0d47a1 100%)', mantra:'Hare Krishna Hare Rama' },
+  durga: { name:'Durga', emoji:'🦁', darshanEmoji:'🪷', blessing:'Jai Mata Di', color:'#e63946', gradient:'radial-gradient(circle at 50% 40%, #fce4ec 0%, #f8bbd0 25%, #f06292 50%, #e91e63 80%, #880e4f 100%)', mantra:'Om Dum Durgaye Namah' },
+  hanuman: { name:'Hanuman', emoji:'🏔', darshanEmoji:'🙏', blessing:'Jai Bajrang Bali', color:'#ff6b35', gradient:'radial-gradient(circle at 50% 40%, #fff3e0 0%, #ffcc80 25%, #ffa726 50%, #ef6c00 80%, #bf360c 100%)', mantra:'Om Hanumate Namah' },
+  ram: { name:'Ram', emoji:'🏹', darshanEmoji:'🏹', blessing:'Jai Shree Ram', color:'#ff8c42', gradient:'radial-gradient(circle at 50% 40%, #fff8e1 0%, #ffe082 25%, #ffd54f 50%, #ff8f00 80%, #e65100 100%)', mantra:'Shree Ram Jai Ram Jai Jai Ram' },
+  quran: { name:'Quran', emoji:'📖', darshanEmoji:'📖', blessing:'Bismillah', color:'#2d8a4e', gradient:'radial-gradient(circle at 50% 40%, #e8f5e9 0%, #a5d6a7 50%, #2e7d32 100%)' },
+  salah: { name:'Salah', emoji:'🕌', darshanEmoji:'🕌', blessing:'Allahu Akbar', color:'#2d8a4e', gradient:'radial-gradient(circle at 50% 40%, #e8f5e9 0%, #a5d6a7 50%, #2e7d32 100%)' },
+  dua: { name:'Dua', emoji:'🤲', darshanEmoji:'🤲', blessing:'SubhanAllah', color:'#2d8a4e', gradient:'radial-gradient(circle at 50% 40%, #e8f5e9 0%, #a5d6a7 50%, #2e7d32 100%)' },
+  dhikr: { name:'Dhikr', emoji:'📿', darshanEmoji:'📿', blessing:'SubhanAllah', color:'#2d8a4e', gradient:'radial-gradient(circle at 50% 40%, #e8f5e9 0%, #a5d6a7 50%, #2e7d32 100%)' },
 };
 
 var TEMPLES = {
@@ -528,21 +531,75 @@ function openDarshan(idx) {
 
   var faithColor = USER_FAITH === 'muslim' ? '#2d8a4e' : (DEITY_DATA[USER_DEITY] || DEITY_DATA.ganesh).color;
 
+  var deityInfo = DEITY_DATA[USER_DEITY] || DEITY_DATA.ganesh;
+
   openOverlay(
-    '<div style="height:140px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:' + t.gradient + ';margin-bottom:16px;position:relative;">'
-    + '<svg width="48" height="48" viewBox="0 0 24 24" fill="rgba(255,255,255,0.5)"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/></svg>'
-    + (t.live ? '<div style="position:absolute;top:10px;left:10px;background:#fa2f40;border-radius:4px;padding:3px 8px;display:flex;align-items:center;gap:4px;"><div style="width:5px;height:5px;border-radius:50%;background:#fff;animation:livePulse 1.2s infinite;"></div><span style="font-size:9px;font-weight:800;color:#fff;">LIVE</span></div>' : '')
+    // ── Deity Darshan Visual ──
+    '<div style="position:relative;margin:-20px -20px 16px -20px;border-radius:16px 16px 0 0;overflow:hidden;height:240px;background:' + deityInfo.gradient + ';">'
+    // Mandala ring
+    + '<div style="position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);width:160px;height:160px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);animation:breatheRing 3s ease infinite;"></div>'
+    + '<div style="position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);width:130px;height:130px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);animation:breatheRing 3s ease 0.5s infinite;"></div>'
+    // Deity icon + name
+    + '<div style="position:absolute;top:44%;left:50%;transform:translate(-50%,-50%);text-align:center;">'
+    + '<div style="font-size:72px;filter:drop-shadow(0 4px 20px rgba(0,0,0,0.3));animation:breathe 3s ease 0.2s infinite;">' + deityInfo.darshanEmoji + '</div>'
+    + '<div style="margin-top:4px;font-size:14px;font-weight:700;color:rgba(255,255,255,0.9);text-shadow:0 1px 8px rgba(0,0,0,0.4);letter-spacing:1px;">' + deityInfo.mantra + '</div>'
     + '</div>'
-    + '<div class="overlay-title">' + t.name + '</div>'
-    + '<div class="overlay-subtitle">' + t.desc + '</div>'
+    // Floating diyas
+    + '<div style="position:absolute;bottom:16px;left:24px;font-size:22px;animation:floatDiya 2.5s ease infinite;">🪔</div>'
+    + '<div style="position:absolute;bottom:20px;right:24px;font-size:22px;animation:floatDiya 2.5s ease 0.8s infinite;">🪔</div>'
+    + '<div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);font-size:18px;animation:floatDiya 2.5s ease 1.5s infinite;">🌺</div>'
+    // LIVE badge
+    + (t.live ? '<div style="position:absolute;top:12px;left:12px;background:#fa2f40;border-radius:6px;padding:4px 10px;display:flex;align-items:center;gap:5px;backdrop-filter:blur(4px);"><div style="width:6px;height:6px;border-radius:50%;background:#fff;animation:livePulse 1.2s infinite;"></div><span style="font-size:10px;font-weight:800;color:#fff;letter-spacing:0.5px;">LIVE</span></div>' : '')
+    // Viewer count
+    + '<div style="position:absolute;top:12px;right:12px;background:rgba(0,0,0,0.4);border-radius:6px;padding:4px 10px;backdrop-filter:blur(4px);"><span style="font-size:10px;font-weight:600;color:#fff;">' + t.viewers + ' watching</span></div>'
+    // Bottom gradient + temple name
+    + '<div style="position:absolute;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%);">'
+    + '<div style="font-size:16px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.5);">' + t.name + '</div>'
+    + '<div style="font-size:11px;color:rgba(255,255,255,0.8);margin-top:2px;">' + t.timing + '</div>'
+    + '</div></div>'
+    // ── Blessing text ──
+    + '<div style="text-align:center;padding:10px 0 6px;font-size:16px;font-weight:700;color:' + deityInfo.color + ';letter-spacing:0.3px;">' + deityInfo.blessing + '</div>'
+    + '<div class="overlay-subtitle" style="text-align:center;">' + t.desc + '</div>'
+    // ── Action Grid ──
     + '<div class="darshan-actions">'
-    + '<div class="darshan-action"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#fff3ed') + ';">🌸</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Sadqa' : 'Offer Flowers') + '</div></div>'
-    + '<div class="darshan-action"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#fef7e9') + ';">🪔</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Dua Request' : 'Virtual Aarti') + '</div></div>'
-    + '<div class="darshan-action"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#e8f5ec') + ';">🍲</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Langar Donation' : 'Online Prasad') + '</div></div>'
-    + '<div class="darshan-action"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#e8e8fc') + ';">🎁</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Zakat' : 'Aashirwaad Box') + '</div></div>'
+    + '<div class="darshan-action" onclick="showDarshanAction(\'flowers\')"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#fff3ed') + ';">🌸</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Sadqa' : 'Offer Flowers') + '</div></div>'
+    + '<div class="darshan-action" onclick="showDarshanAction(\'aarti\')"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#fef7e9') + ';">🪔</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Dua Request' : 'Virtual Aarti') + '</div></div>'
+    + '<div class="darshan-action" onclick="showDarshanAction(\'prasad\')"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#e8f5ec') + ';">🍲</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Langar Donation' : 'Online Prasad') + '</div></div>'
+    + '<div class="darshan-action" onclick="showDarshanAction(\'gift\')"><div class="darshan-action-icon" style="background:' + (USER_FAITH === 'muslim' ? '#e8f5ec' : '#e8e8fc') + ';">🎁</div><div class="darshan-action-label">' + (USER_FAITH === 'muslim' ? 'Zakat' : 'Aashirwaad Box') + '</div></div>'
     + '</div>'
+    // ── CTA ──
     + '<button style="width:100%;margin-top:16px;padding:14px;background:' + faithColor + ';border:none;border-radius:12px;font-family:JioType,sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">' + (t.live ? (USER_FAITH === 'muslim' ? 'Watch Live' : 'Watch Live Darshan') : 'Set Reminder') + '</button>'
   );
+}
+
+function showDarshanAction(action) {
+  var deityInfo = DEITY_DATA[USER_DEITY] || DEITY_DATA.ganesh;
+  var msgs = {
+    flowers: { emoji:'🌸🌺🌼', text: deityInfo.name + ' ko phool arpan kiye gaye', sub:'Aapki puja sweekar hui' },
+    aarti: { emoji:'🪔🪔🪔', text: deityInfo.name + ' ki aarti shuru ho rahi hai', sub:'Om Jai Jagdish Hare...' },
+    prasad: { emoji:'🍲🙏', text: 'Prasad ka order diya gaya', sub:'Delivery: 2-3 din mein' },
+    gift: { emoji:'🎁✨', text: 'Aashirwaad Box bheja gaya', sub: deityInfo.blessing },
+  };
+  var m = msgs[action] || msgs.flowers;
+
+  // Show a brief confirmation toast over the overlay
+  var toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);z-index:200;background:rgba(0,0,0,0.88);border-radius:20px;padding:28px 32px;text-align:center;opacity:0;transition:all 400ms cubic-bezier(0.2,0,0,1);pointer-events:none;';
+  toast.innerHTML = '<div style="font-size:40px;margin-bottom:10px;animation:breathe 1.5s ease infinite;">' + m.emoji + '</div>'
+    + '<div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;">' + m.text + '</div>'
+    + '<div style="font-size:12px;color:rgba(255,255,255,0.65);">' + m.sub + '</div>';
+  document.body.appendChild(toast);
+
+  requestAnimationFrame(function() {
+    toast.style.opacity = '1';
+    toast.style.transform = 'translate(-50%,-50%) scale(1)';
+  });
+
+  setTimeout(function() {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translate(-50%,-50%) scale(0.8)';
+    setTimeout(function() { toast.remove(); }, 400);
+  }, 2200);
 }
 
 function openFestival(idx) {
